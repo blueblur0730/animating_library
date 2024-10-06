@@ -1,0 +1,220 @@
+"Games"
+{
+	"#default"
+	{
+		"Offsets"
+		{
+			"OS"
+			{
+				"linux"			"1"
+				"windows"		"0"
+			}
+		}
+	}
+
+    "left4dead2"
+    {
+        "Addresses"
+        {
+            "CBaseAnimating::FindBodyGroupByName"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::FindBodyGroupByName"
+                }
+
+                "windows"
+                {
+                    "signature" "Infected::SetDamagedBodyGroupVariant"
+                    "offset"    "0x1D"  // sub_10403930+1C   E8 (here)[EF] F1 C2 FF    call    sub_10032B40
+                }
+            }
+
+            "CBaseAnimaating::GetBodyGroupName"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::GetBodyGroupName"
+                }
+
+                "windows"
+                {
+                    "signature" "GetScriptDesc<CBaseAnimating>"
+                    "offset"    "0x644" // mov     dword ptr [esi+28h], offset sub_10032AA0
+                }
+            }
+
+            "CBaseAnimating::GetBodyGroupCount"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::GetBodyGroupCount"
+                }
+
+                "windows"
+                {
+                    "signature" "Infected::SetDamagedBodyGroupVariant"
+                    "offset"    "0xB1"  // sub_10403930+B1   E8 AA F1 C2 FF                    call    sub_10032B90
+                }
+            }
+        }
+
+        "Offsets"
+        {
+            "CBaseAnimating::GetBaseAnimating"
+            {
+                "linux"     "60"
+                "windows"   "59"
+            }
+
+            "CBaseAnimating::CanBecomeRagdoll"
+            {
+                "linux"     "212"
+                "windows"   "211"
+            }
+
+            "CBaseAnimating::BecomeRagdollOnClient"
+            {
+                "linux"     "210"
+                "windows"   "209"
+            }
+        }
+
+        "Signatures"
+        {
+            // search for string "D%d_%c%d_%s"
+            "Infected::SetDamagedBodyGroupVariant"
+            {
+                "library"   "server"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x3C\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x8B\x45\x08\x53\x56"
+                /* 55 8B EC 83 EC 3C A1 ? ? ? ? 33 C5 89 45 FC 8B 45 08 53 56 */
+            }
+
+            // search for string "Get the bodygroup id's name" or any other.
+            "GetScriptDesc<CBaseAnimating>"
+            {
+                "library"   "server"
+                "windows"   "\x80\x3D\x2A\x2A\x2A\x2A\x00\x0F\x85\x2A\x2A\x2A\x2A\x53\x56\xB8\x2A\x2A\x2A\x2A\x57\xBB\x01\x00\x00\x00\x6A\x00\x88\x1D\x2A\x2A\x2A\x2A\xC7\x05\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x83\xC4\x04\xA3\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x83\x78\x2C\x00\x75\x2A\x8B\x40\x0C\x85\xC0\x75\x2A\xEB\x2A\x8B\x40\x2C\xA3\x2A\x2A\x2A\x2A\x8B\x0D\x2A\x2A\x2A\x2A\x51\xB9\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8D\x34\x40"
+                /* 80 3D ? ? ? ? 00 0F 85 ? ? ? ? 53 56 B8 ? ? ? ? 57 BB 01 00 00 00 6A 00 88 1D ? ? ? ? C7 05 ? ? ? ? ? ? ? ? A3 ? ? ? ? A3 ? ? ? ? E8 ? ? ? ? 83 C4 04 A3 ? ? ? ? 85 C0 74 ? 83 78 2C 00 75 ? 8B 40 0C 85 C0 75 ? EB ? 8B 40 2C A3 ? ? ? ? 8B 0D ? ? ? ? 51 B9 ? ? ? ? E8 ? ? ? ? 8D 34 40 */
+            }
+
+            "CBaseAnimating::FindBodyGroupByName"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating19FindBodygroupByNameEPKc"
+            }
+
+            // windows sig:
+            // find Infected::SetDamagedBodyGroupVariant follow the description above.
+            // down the buttom of the function, the call below the RandomInt() is CBaseAnimating::SetBodyGroup.
+            "CBaseAnimating::SetBodyGroup"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating12SetBodygroupEii"
+                "wwindows"  "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x8B\xF1\x85\xFF\x0F\x88\x2A\x2A\x2A\x2A\x83\xBE\xD0\x13\x00\x00\x00"
+            }
+
+            // windows sig:
+            // stll find Infected::SetDamagedBodyGroupVariant
+            // at the top of the function, the function below the statement "if ( v4 >= sub_10032BE0(this) )" is CBaseAnimating::GetBodyGroup.
+            "CBaseAnimating::GetBodyGroup"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating12GetBodygroupEi"
+                // may change this with call address in the future. these bytes are too long and may be varied.
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x08\x8B\x96\x48\x04\x00\x00"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 08 8B 96 48 04 00 00 */
+            }
+
+            "CBaseAnimating::GetBodyGroupCount"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating17GetBodygroupCountEi"
+            }
+
+            "CBaseAnimating::GetBodyGroupName"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating16GetBodygroupNameEi"
+            }
+            
+            // windows sig:
+            // find Infected::SetDamagedBodyGroupVariant follow the description above.
+            // on the top of statement "if ( *v7 == 68 )"
+            "CBaseAnimating::GetBodyGroupPartName"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating20GetBodygroupPartNameEii"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x0C"
+                // may change this with call address in the future. these bytes are too long and may be varied.
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 0C */
+            }
+
+            // windows sig:
+            // find Infected::SetDamagedBodyGroupVariant follow the description above.
+            // inside of the statement "if ( v4 >= sub_10032BE0(this) )"
+            "CBaseAnimating::GetNumBodyGroups"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating16GetNumBodyGroupsEv"
+                "windows"   "\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x50"
+                // may change this with call address in the future. these bytes are too long and may be varied.
+                /* 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 50 */
+            }
+
+            // windows sig:
+            // search for string "UpperBody" with all occurance found, the first one is the target: CInfectedZooPuppet::Spawn
+            // (with string like "%d %d %d %d", "LowerBody", "FCVAR_NEVER_AS_STRING" in it.)
+            // on the buttom of the function, at the top of the statement "if ( v21 >= 0 )" (within a 'for' statement "for ( j = (int)v23; ; v13 = (_BYTE *)j )")
+            // the call is CBaseAnimating::FindBodyGroupVariant.
+            "CBaseAnimating::FindBodyGroupVariant"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating20FindBodyGroupVariantEii"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x08\x53\x56\x57\x33\xF6"
+                /* 55 8B EC 83 EC 08 53 56 57 33 F6 */
+            }
+
+            // windows sig:
+            // find CInfectedZooPuppet::Spawn as above
+            // on the beginning of the function, right under the string "UpperBody"
+            // the second call in the 'for statement' (for ( i = 8; i < 0x14; i += 4 )) is CBaseAnimating::CountBodyGroupVariant.
+            "CBaseAnimating::CountBodyGroupVariant"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating22CountBodyGroupVariantsEi"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x08\x53\x56\x57\x33\xDB\x8B\xF9\x89\x5D\xFC\x39\x9F\xD0\x13\x00\x00"
+                /* 55 8B EC 83 EC 08 53 56 57 33 DB 8B F9 89 5D FC 39 9F D0 13 00 00 */
+            }
+
+            // unused by game.
+            "CBaseAnimating::FindDamagedBodyGroupVariant"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating27FindDamagedBodyGroupVariantEi"
+            }
+
+            // CBaseAnimating::RandomizeBodygroups(CUtlVector<char const*,CUtlMemory<char const*,int>> &)
+            // int __cdecl CBaseAnimating::RandomizeBodygroups(CBaseEntity *a1, _DWORD *a2)
+            // original: void CBaseAnimating::RandomizeBodygroups( CUtlVector< const char * >& groups )
+            // https://github.com/ReactiveDrop/reactivedrop_public_src/blob/0b3a6dcd74dce45e35ca6c0d823fd19ccc610b91/src/game/server/baseanimating.cpp#L2407
+            // assumming that this is used to randomize the models for CIs.
+
+            // L4D2/Reactive Drop/TF2(?). not exists in source sdk 2013.
+            // sadly, there is no existed method to pass a CultVector to the parameter if we try to use SDKCall.
+            // this signature will remain here.
+
+            // windows sig:
+            // search for string "SetModelFromClass: Survivor %s changed model from %s to %s via SetModelFromClass\n" or "no_female_boomers" (matched second call) to find CTerrorPlayer::SetModelFromClass
+            // at the buttom of the function, the call that is below the string "UpperBody" or "LowerBody" is CBaseAnimating::RandomizeBodygroups.
+            "CBaseAnimating::RandomizeBodygroups"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating19RandomizeBodygroupsER10CUtlVectorIPKc10CUtlMemoryIS2_iEE"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x20\x8B\x45\x08\x53"
+                /* 55 8B EC 83 EC 20 8B 45 08 53 */
+            }
+
+        }
+    }
+}
