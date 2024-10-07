@@ -206,6 +206,9 @@ methodmap CBaseAnimating
     /**
      * Return the name of the sequence for the index provided.
      * 
+     * @note            Returns string "Not Found!" on bad sequence number.
+     * @note            Returns string "No Model!" if no model is found on this enitty.
+     * 
      * @param sequence  The index of the sequence to get the name of.
      * @param name      The buffer to store the name of the sequence.
      * 
@@ -227,6 +230,9 @@ methodmap CBaseAnimating
     /**
      * Returns the activity name for the given sequence id.
      * 
+     * @note            Returns string "Not Found!" on bad sequence number.
+     * @note            Returns string "No Model!" if no model is found on this enitty.
+     * 
      * @param sequence  The index of the sequence to get the activity name of.
      * @param name      The buffer to store the name of the activity.
      * 
@@ -240,6 +246,7 @@ methodmap CBaseAnimating
      * @param sequence  The index of the sequence to get the keyvalues of.
      * 
      * @return          The internal keyvalues pointer address.
+     *                  NULL on failure.
     */
     public native Address GetSequenceKeyValues(int sequence);
     // public native SourceKeyValues GetSequenceKeyValues(int sequence);

@@ -43,3 +43,7 @@
     7. CBaseAnimating.GetSequenceLinearMotion
     8. CBaseAnimating.GetSequenceMoveYaw
     9. CBaseAnimating.GetSequenceMoveDist
+
+  - Changes:
+    1. An entity that has no model will fail to create a new instance.
+    2. Some documentations added for natives.
