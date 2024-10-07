@@ -68,3 +68,7 @@
     2. MARKED NATIVE AS OPTIONAL
     3. Some documentations added for natives.
     4. Fixed an issue related to FindBodyGroupByName string passing.
+
+- 10/8/24: v1.4.1
+  - Changes:
+    1. Fixed parameter missing of SequenceDration call setup.

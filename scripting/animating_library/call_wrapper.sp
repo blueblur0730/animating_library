@@ -220,7 +220,7 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper ret18 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_GetSequenceMovement		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceMovement", params17, sizeof(params17), true, ret18);
 
-	SDKCallParamsWrapper params18[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper params18[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL}, {SDKType_PlainOldData, SDKPass_Plain}};
 	SDKCallParamsWrapper ret19 			= { SDKType_Float, SDKPass_Plain };
 	g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SequenceDuration", params18, sizeof(params18), true, ret19);
 

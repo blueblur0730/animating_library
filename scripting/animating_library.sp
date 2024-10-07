@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.4"
+#define PLUGIN_VERSION "1.4.1"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
