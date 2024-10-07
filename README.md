@@ -17,24 +17,24 @@
 - 10/5/24: v1.0
   - Initial commit.
   - Natives:
-    1. FindBodyGroupByName
-    2. SetBodyGroup
+    1. CBaseAnimating.FindBodyGroupByName
+    2. CBaseAnimating.SetBodyGroup
 
 - 10/6/24: v1.1
   - Natives:
-    1. GetBodyGroup
-    2. GetBodyGroupCount
-    3. GetBodyGroupName
-    4. GetBodyPartName
-    5. BodyGroupNum.get
-    6. FindBodyGroupVariant
-    7. CountBodyGroupVariants
+    1. CBaseAnimating.GetBodyGroup
+    2. CBaseAnimating.GetBodyGroupCount
+    3. CBaseAnimating.GetBodyGroupName
+    4. CBaseAnimating.GetBodyPartName
+    5. CBaseAnimating.BodyGroupNum.get
+    6. CBaseAnimating.FindBodyGroupVariant
+    7. CBaseAnimating.CountBodyGroupVariants
 
 - 10/7/24: v1.2
   - Natives:
-    1. IsRagdoll
-    2. CanBecomeRagdoll
-    3. BecomeRagdollOnClient
+    1. CBaseAnimating.IsRagdoll
+    2. CBaseAnimating.CanBecomeRagdoll
+    3. CBaseAnimating.BecomeRagdollOnClient
 
 - 10/7/24: v1.3
   - Natives:
