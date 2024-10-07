@@ -193,6 +193,12 @@ methodmap CBaseAnimating
     /*<---------------->*/
     /* Sequence Related */
 
+    // see documenation here:
+    // https://developer.valvesoftware.com/wiki/$sequence
+
+    // Any sequence number should be >= 0.
+    // bad seqeunce number may cause some unknown errors.
+
     /**
      * Get/Set the value of m_nSequence.
      * 
@@ -287,6 +293,86 @@ methodmap CBaseAnimating
      * @return          The distance the entity moved over the course of the sequence.
     */
     public native float GetSequenceMoveDist(int sequence);
+
+    /**
+     * Returns the delta movement and angles of a sequence of the entity's model.
+     * 
+     * @param nSequence     The index of the sequence to get the motion of.
+     * @param fromCycle     The starting cycle of the sequence. 0 is the start of the animation, 1 is the end.
+     * @param toCycle       The ending cycle of the sequence. 0 is the start of the animation, 1 is the end. Values like 2, etc are allowed.
+     * @param deltaPosition The delta vector of the animation, how much the model's origin point moved. A Vector buffer to store the delta position.
+     * @param deltaAngles   The delta angle of the animation. A QAngle buffer to store the delta angles.
+     * 
+     * @return              True if the operation was successful, false otherwise.
+    */
+    public native bool GetSequenceMovement(int nSequence, float fromCycle, float toCycle, float deltaPosition[3], float deltaAngles[3]);
+
+    /**
+     * Returns length of sequence.
+     * 
+     * @param sequence  The index of the sequence to get the duration of.
+     * 
+     * @return          The duration of the sequence in seconds.
+     *                  0.1 on unavailable sequence, or (x < 0 || x > Max sequence number of the model of this entity)
+    */
+    public native float SequenceDuration(int sequence);
+
+    /**
+     * Returns the cycle rate of the sequence.
+     * 
+     * @param sequence  The index of the sequence to get the cycle rate of.
+     * 
+     * @return          The cycle rate of the sequence in seconds per cycle.
+     *                  10.0 if sequence duration <= 0.0.
+    */
+    public native float GetSequenceCycleRate(int sequence);
+
+    /**
+     * Returns the ground speed of the entity's sequence.
+     * 
+     * @param sequence  The index of the sequence to get the ground speed of.
+     * 
+     * @return          The ground speed of the sequence in units per second.
+     *                  0.0 if sequence duration <= 0.0.
+    */
+    public native float GetSequenceGroundSpeed(int sequence);
+
+    /**
+     * Returns sequence ID from its name.
+     * 
+     * @note            From SDK: "Looks up a sequence by sequence name first, then by activity name."
+     * @note            Which means a failure on the sequence name lookup will call LookupActivity().
+     * 
+     * @param name      The name of the sequence to get the ID of.
+     * 
+     * @return          The index of the sequence with the given name. Or an index calls from SelectWeightedSequence() by LookupActivity().
+     *                  0 if sequence is not available (notice: 0 is a valid sequence number too), -1 (ACT_INVALID) on failure for LookupActivity().
+    */
+    public native int LookupSequence(const char[] name);
+
+    /**
+     * Checks if a sequence number is valid or not.
+     * 
+     * @note            This native uses SDKCall since we need to know how many sequence this entity's model has.
+     * 
+     * @param sequence  The index of the sequence to check.
+     * 
+     * @return          True if the sequence is valid, false otherwise.
+    */
+    public native bool IsValidSequence(int sequence);
+
+    /**
+     * Returns whether the entity's current sequence is finished or not.
+     * 
+     * @param sequence  The index of the sequence to check.
+     * 
+     * @return          True if the sequence is finished, false otherwise.
+    */
+    public native bool IsSequenceFinished(int sequence);
+
+    /**
+     * Checks if a sequence is 
+    */
 }
 
 public SharedPlugin __pl_animating_library = 
@@ -317,5 +403,22 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.IsRagdoll");
     MarkNativeAsOptional("CBaseAnimating.CanBecomeRagdoll");
     MarkNativeAsOptional("CBaseAnimating.BecomeRagdollOnClient");
+
+    MarkNativeAsOptional("CBaseAnimating.m_nSequence.get");
+    MarkNativeAsOptional("CBaseAnimating.m_nSequence.set");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceName");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceActivity");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceActivityName");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceKeyValues");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceLinearMotion");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceMoveYaw");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceMoveDist");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceMovement");
+    MarkNativeAsOptional("CBaseAnimating.SequenceDuration");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceCycleRate");
+    MarkNativeAsOptional("CBaseAnimating.GetSequenceGroundSpeed");
+    MarkNativeAsOptional("CBaseAnimating.LookupSequence");
+    MarkNativeAsOptional("CBaseAnimating.IsValidSequence");
+    MarkNativeAsOptional("CBaseAnimating.IsSequenceFinished");
 }
 #endif

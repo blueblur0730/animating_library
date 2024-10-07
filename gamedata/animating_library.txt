@@ -86,7 +86,19 @@
                 }
             }
 
+            "CBaseAnimating::LookupSequence"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::LookupSequence"
+                }
 
+                "windows"
+                {
+                    "signature" "CDynamicProp::PropSetAnim"
+                    "offset"    "0xF"   // sub_10196990+F    E8 9C AE E9 FF                    call    sub_10031840
+                }
+            }
         }
 
         "Offsets"
@@ -126,6 +138,36 @@
                 "library"   "server"
                 "windows"   "\x80\x3D\x2A\x2A\x2A\x2A\x00\x0F\x85\x2A\x2A\x2A\x2A\x53\x56\xB8\x2A\x2A\x2A\x2A\x57\xBB\x01\x00\x00\x00\x6A\x00\x88\x1D\x2A\x2A\x2A\x2A\xC7\x05\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x83\xC4\x04\xA3\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x83\x78\x2C\x00\x75\x2A\x8B\x40\x0C\x85\xC0\x75\x2A\xEB\x2A\x8B\x40\x2C\xA3\x2A\x2A\x2A\x2A\x8B\x0D\x2A\x2A\x2A\x2A\x51\xB9\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8D\x34\x40"
                 /* 80 3D ? ? ? ? 00 0F 85 ? ? ? ? 53 56 B8 ? ? ? ? 57 BB 01 00 00 00 6A 00 88 1D ? ? ? ? C7 05 ? ? ? ? ? ? ? ? A3 ? ? ? ? A3 ? ? ? ? E8 ? ? ? ? 83 C4 04 A3 ? ? ? ? 85 C0 74 ? 83 78 2C 00 75 ? 8B 40 0C 85 C0 75 ? EB ? 8B 40 2C A3 ? ? ? ? 8B 0D ? ? ? ? 51 B9 ? ? ? ? E8 ? ? ? ? 8D 34 40 */
+            }
+
+            // search for string "Dynamic prop %s: no sequence named:%s\n"
+            // (two matched results, choose the short one)
+            "CDynamicProp::PropSetAnim"
+            {
+                "library"   "server"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x8B\xF1\x85\xFF\x74\x2A\x57\xE8\x2A\x2A\x2A\x2A\x8B\xCE"
+                /* 55 8B EC 56 57 8B 7D 08 8B F1 85 FF 74 ? 57 E8 ? ? ? ? 8B CE */
+            }
+
+            // windows sig:
+            // find CModelSoundsCache::Rebuild on its own vtable (offset 2)
+            // the first call is it.
+            "ModelSoundsCache_LoadModel"
+            {
+                "library"   "server"
+                "linux"     "@_Z26ModelSoundsCache_LoadModelPKc"
+                "windows"   "\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x55\x08\x8B\x40\x14"
+                /* 55 8B EC 8B 0D ? ? ? ? 8B 01 8B 55 08 8B 40 14 */
+            }
+
+            // windows sig:
+            // same as above, the third call is it.
+            "ModelSoundsCache_FinishModel"
+            {
+                "library"   "server"
+                "linux"     "@_Z28ModelSoundsCache_FinishModelP10CStudioHdr"
+                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x08\x85\xF6\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8D\x4E\x40"
+                /* 55 8B EC 56 8B 75 08 85 F6 74 ? 8B CE E8 ? ? ? ? 8D 4E 40 */
             }
 
             "CBaseAnimating::FindBodyGroupByName"
@@ -312,6 +354,46 @@
                 "linux"     "@_ZN14CBaseAnimating23GetSequenceLinearMotionEiP6Vector"
                 "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x0C"
                 /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 0C */
+            }
+
+            // windows sig:
+            // search for string "NetGesture %d : (%1.3f) %s" to find CTerrorPlayerAnimState::Update (vtable: 3)
+            // in the middle of the function, the long long long 'if' statement "if ( v11 && v13 >= *(float *)(a1 + 284) && v14 >= 0 && v14 < sub_101E3D40(LODWORD(v43)) )"
+            // inside of it, call that passes many arguments (5) is CBaseAnimating::GetSequenceMovement (I think that is explicit enough.)
+            "CBaseAnimating::GetSequenceMovement"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating19GetSequenceMovementEiffR6VectorR6QAngle"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x32\xC0"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 85 C0 74 ? 83 38 00 75 ? 32 C0 */
+            }
+
+            // windows sig:
+            // search for string "CBaseAnimating::SequenceDuration( %d ) NULL pstudiohdr on %s!\n" or "CBaseAnimating::SequenceDuration( %d ) out of range\n"
+            "CBaseAnimating::SequenceDuration"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating14SequenceDurationEi"
+                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x08\x57\x8B\xF9\x85\xF6\x75\x2A\x8B\x47\x74"
+                /* 55 8B EC 56 8B 75 08 57 8B F9 85 F6 75 ? 8B 47 74 */
+            }
+
+            "CBaseAnimating::LookupSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating14LookupSequenceEPKc"
+            }
+
+            // windows sig:
+            // go to the vtable of CGenericFlexCycler and find CFlexCycler::OnTakeDamage (offset 72) (sub_10074EA0)
+            // (count it on youself or use tools.)
+            // as you can see the first one is it.
+            "CBaseAnimating::IsValidSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating14IsValidSequenceEi"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x8E\xD0\x13\x00\x00\x85\xC9"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 8E D0 13 00 00 85 C9 */
             }
         }
     }

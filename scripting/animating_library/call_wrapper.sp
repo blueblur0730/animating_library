@@ -10,17 +10,19 @@ methodmap CBaseAnimating
 		return view_as<CBaseAnimating>(view_as<Address>(SDKCall(g_hSDKCall_GetBaseAnimating, entity)));
 	}
 
-	property Address Pointer {
-	    public get() { return view_as<Address>(this); }
-	}
-
-	// sourcemod recongnizes this pointer as ref. so you dont have to use sdkcall to convert address to index.
+	// report me if there is any difference.
+	// sourcemod recongnizes CBaseEnitty pointer as ref. so you dont have to use sdkcall to convert address to index.
 	property int Entity {
 		public get() { return EntRefToEntIndex(view_as<int>(this)); }
 	}
 
-	public int FindBodyGroupByName(const char[] name, int maxlen) {
-		return SDKCall(g_hSDKCall_FindBodyGroupByName, view_as<Address>(this), name, maxlen);
+	// retrieves the CBaseAnimating pointer of the entity.
+	property Address Pointer {
+	    public get() { return view_as<Address>(this); }
+	}
+
+	public int FindBodyGroupByName(const char[] name) {
+		return SDKCall(g_hSDKCall_FindBodyGroupByName, view_as<Address>(this), name);
 	}
 
 	public void SetBodyGroup(int iGroup, int iValue) {
@@ -107,11 +109,60 @@ methodmap CBaseAnimating
 		this.GetSequenceLinearMotion(sequence, vec);
 		return GetVectorLength(vec);
 	}
+
+	public bool GetSequenceMovement(int nSequence, float fromCycle, float toCycle, float deltaPosition[3], float deltaAngles[3]) {
+		return SDKCall(g_hSDKCall_GetSequenceMovement, view_as<Address>(this), nSequence, fromCycle, toCycle, deltaPosition, deltaAngles);
+	}
+
+	public float SequenceDuration(int sequence) {
+		return SDKCall(g_hSDKCall_SequenceDuration, view_as<Address>(this), CStudioHdr(this.Entity).Pointer, sequence);
+	}
+	
+	public float GetSequenceCycleRate(int sequence) {
+		float flDuration = this.SequenceDuration(sequence);
+		if (flDuration > 0.0) 
+			return 1.0 / flDuration;
+		else
+			return 10.0;	// 1.0f / 0.1f;
+	}
+		
+	public float GetSequenceGroundSpeed(int sequence) {
+		float flDuration = this.SequenceDuration(sequence);
+		if (flDuration > 0.0)
+			return this.GetSequenceMoveDist(sequence) / flDuration;
+		else
+			return 0.0;	// 0
+	}
+
+	public int LookupSequence(const char[] name) {
+		return SDKCall(g_hSDKCall_LookupSequence, view_as<Address>(this), name);
+	}
+
+	public bool IsValidSequence(int sequence) {
+		return SDKCall(g_hSDKCall_IsValidSequence, view_as<Address>(this), sequence);
+	}
+
+	public bool IsSequenceFinished(int sequence) {
+		return view_as<bool>(GetEntProp(this.Entity, Prop_Send, "m_bSequenceFinished"));
+	}
+}
+
+methodmap CStudioHdr
+{
+	// retrieves the CStudioHdr pointer based on the entity's model.
+	public CStudioHdr(int entity) {
+		return view_as<CStudioHdr>(GetEntityCStudioHdr(entity));
+	}
+
+	property Address Pointer {
+		public get() { return view_as<Address>(this); }
+	}
 }
 
 void CreateSDKCalls()
 {
 	GameDataWrapper	gd = new GameDataWrapper(GAMEDATA_FILE);
+	CreateCStuidoHdrSDKCalls(gd);
 
 	// weird sourcemod shit
 	// https://forums.alliedmods.net/showthread.php?t=344325
@@ -165,6 +216,17 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper params16[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_Pointer }};
 	g_hSDKCall_GetSequenceLinearMotion	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceLinearMotion", params16, sizeof(params16), false, _);
 
+	SDKCallParamsWrapper params17[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Float, SDKPass_Plain }, { SDKType_Float, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_Vector, SDKPass_ByRef }};
+	SDKCallParamsWrapper ret18 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_GetSequenceMovement		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceMovement", params17, sizeof(params17), true, ret18);
+
+	SDKCallParamsWrapper params18[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret19 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SequenceDuration", params18, sizeof(params18), true, ret19);
+
+	SDKCallParamsWrapper params20[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret21 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_IsValidSequence			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::IsValidSequence", params20, sizeof(params20), true, ret21);
 
 	switch (gd.OS)
 	{
@@ -189,6 +251,10 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params13[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret15 			= { SDKType_String, SDKPass_Pointer };
 			g_hSDKCall_GetSequenceActivityName	= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetSequenceActivityName", params13, sizeof(params13), true, ret15);
+
+			SDKCallParamsWrapper params19[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret20 			= { SDKType_Float, SDKPass_Plain };
+			g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::LookupSequence", params19, sizeof(params19), true, ret20);
 		}
 
 		case OS_Linux:
@@ -212,10 +278,24 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params13[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret15 			= { SDKType_String, SDKPass_Pointer };
 			g_hSDKCall_GetSequenceActivityName	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceActivityName", params13, sizeof(params13), true, ret15);
+
+			SDKCallParamsWrapper params19[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret20 			= { SDKType_Float, SDKPass_Plain };
+			g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupSequence", params19, sizeof(params19), true, ret20);
 		}
 	}
 
 	delete gd;
+}
+
+void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
+{
+	SDKCallParamsWrapper params[] 			= {{ SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret 				= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_ModelSoundCache_LoadModel 	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_LoadModel", params, sizeof(params), true, ret);
+
+	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	g_hSDKCall_ModelSoundCache_FinishModel = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
 }
 
 void CreateNatives()
@@ -244,4 +324,33 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.GetSequenceLinearMotion", Native_GetSequenceLinearMotion);
 	CreateNative("CBaseAnimating.GetSequenceMoveYaw", Native_GetSequenceMoveYaw);
 	CreateNative("CBaseAnimating.GetSequenceMoveDist", Native_GetSequenceMoveDist);
+	CreateNative("CBaseAnimating.GetSequenceMovement", Native_GetSequenceMovement);
+	CreateNative("CBaseAnimating.SequenceDuration", Native_SequenceDuration);
+	CreateNative("CBaseAnimating.GetSequenceCycleRate", Native_GetSequenceCycleRate);
+	CreateNative("CBaseAnimating.GetSequenceGroundSpeed", Native_GetSequenceGroundSpeed);
+	CreateNative("CBaseAnimating.LookupSequence", Native_LookupSequence);
+	CreateNative("CBaseAnimating.IsValidSequence", Native_IsValidSequence);
+	CreateNative("CBaseAnimating.IsSequenceFinished", Native_IsSequenceFinished);
+}
+
+// Big thanks to LuqS
+// https://forums.alliedmods.net/showthread.php?t=333857
+Address GetEntityCStudioHdr(int entity)
+{
+	char sModel[PLATFORM_MAX_PATH];
+	GetEntPropString(entity, Prop_Data, "m_ModelName", sModel, sizeof(sModel));
+
+	if (!sModel[0])
+		return Address_Null;
+
+	// Create a new CStudioHdr instance based on the model path.
+	Address pCStudioHdr = SDKCall(g_hSDKCall_ModelSoundCache_LoadModel, sModel);
+		
+	if (!pCStudioHdr)
+		return Address_Null;
+
+	// Delete the CStudioHdr instance to not leak memory.
+	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pCStudioHdr);
+
+	return pCStudioHdr;
 }

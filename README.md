@@ -52,3 +52,19 @@
   - Changes:
     1. An entity that has no model will fail to create a new instance.
     2. Some documentations added for natives.
+
+- 10/8/24: v1.4
+  - Natives:
+    1. CBaseAnimating.GetSequenceMovement
+    2. CBaseAnimating.SequenceDuration
+    3. CBaseAnimating.GetSequenceCycleRate
+    4. CBaseAnimating.GetSequenceGroundSpeed
+    5. CBaseAnimating.LookupSequence
+    6. CBaseAnimating.IsValidSequence
+    7. CBaseAnimating.IsSequenceFinished
+
+  - Changes:
+    1. Added method to get the CStudioHdr pointer, credits to LuqS.
+    2. MARKED NATIVE AS OPTIONAL
+    3. Some documentations added for natives.
+    4. Fixed an issue related to FindBodyGroupByName string passing.
