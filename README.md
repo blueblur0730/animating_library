@@ -7,6 +7,7 @@
 ### Note
 
 - These natives are NOT TESTED. Use at your own risk. I'd be appreciated if you could report any issues or bugs, or help fix them.
+- May not work in windows server since the signatures are unstable or not found.
 
 ### Requiements
 
