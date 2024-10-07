@@ -4,6 +4,10 @@
 
 - Various internal functions of class CBaseAnimating. Currently supported L4D2.
 
+### Note
+
+- These natives are NOT TESTED. Use at your own risk. I'd be appreciated if you could report any issues or bugs, or help fix them.
+
 ### Requiements
 
 - None.
