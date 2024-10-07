@@ -7,22 +7,30 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.2"
+#define PLUGIN_VERSION "1.3"
 
 Handle
-	g_hSDKCall_GetBaseAnimating		  = null,
-	g_hSDKCall_FindBodyGroupByName	  = null,
-	g_hSDKCall_SetBodyGroup			  = null,
-	g_hSDKCall_GetBodyGroup			  = null,
-	g_hSDKCall_GetBodyGroupCount	  = null,
-	g_hSDKCall_GetBodyGroupName		  = null,
-	g_hSDKCall_GetBodyGroupPartName	  = null,
-	g_hSDKCall_GetNumBodyGroups		  = null,
-	g_hSDKCall_FindBodyGroupVariant	  = null,
-	g_hSDKCall_CountBodyGroupVariant  = null,
+	g_hSDKCall_GetBaseAnimating		  	= null,
+	g_hSDKCall_FindBodyGroupByName	  	= null,
+	g_hSDKCall_SetBodyGroup			  	= null,
+	g_hSDKCall_GetBodyGroup			  	= null,
+	g_hSDKCall_GetBodyGroupCount	  	= null,
+	g_hSDKCall_GetBodyGroupName		  	= null,
+	g_hSDKCall_GetBodyGroupPartName	  	= null,
+	g_hSDKCall_GetNumBodyGroups		  	= null,
+	g_hSDKCall_FindBodyGroupVariant	  	= null,
+	g_hSDKCall_CountBodyGroupVariant  	= null,
 
-	g_hSDKCall_CanBecomeRagdoll		  = null,
-	g_hSDKCall_BecomeRagdollOnClient  = null;
+	g_hSDKCall_CanBecomeRagdoll		  	= null,
+	g_hSDKCall_BecomeRagdollOnClient  	= null,
+
+	g_hSDKCall_SetSequence			  	= null,
+	g_hSDKCall_GetSequenceName			= null,
+	g_hSDKCall_GetSequenceActivity		= null,
+	g_hSDKCall_GetSequenceActivityName 	= null,
+	g_hSDKCall_GetSequenceKeyValues		= null,
+	g_hSDKCall_GetSequenceLinearMotion	= null,
+	g_hSDKCall_GetSequenceMoveYaw		= null;
 
 #include "animating_library/call_wrapper.sp"
 CBaseAnimating pWrapper;
@@ -59,11 +67,29 @@ public void OnPluginStart()
 	CreateSDKCalls();
 }
 
+bool ValidateAddress(CBaseAnimating wrapper)
+{
+	return wrapper.Pointer != Address_Null ? true : false;
+}
+
+bool HasModel(int entity)
+{
+	char buffer[PLATFORM_MAX_PATH];
+	GetEntPropString(entity, Prop_Data, "m_ModelName", buffer, sizeof(buffer));
+	return buffer[0] != '\0' ? true : false;
+}
+
 any Native_CBaseAnimating(Handle plugin, int numParams)
 {
 	int entity = GetNativeCell(1);
-	pWrapper = CBaseAnimating(entity);
 
+	if (!HasModel(entity))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Entity has no model.");
+		return 0;
+	}
+
+	pWrapper = CBaseAnimating(entity);
 	return pWrapper.Pointer;
 }
 
@@ -206,7 +232,7 @@ int Native_CountBodyGroupVarirant(Handle plugin, int numParams)
 	return pWrapper.CountBodyGroupVariant(iGroup);
 }
 
-int Native_IsRagdoll(Handle plugin, int numParams)
+any Native_IsRagdoll(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(pWrapper))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
@@ -214,7 +240,7 @@ int Native_IsRagdoll(Handle plugin, int numParams)
 	return pWrapper.IsRagdoll();
 }
 
-int Native_CanBecomeRagdoll(Handle plugin, int numParams)
+any Native_CanBecomeRagdoll(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(pWrapper))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
@@ -222,7 +248,7 @@ int Native_CanBecomeRagdoll(Handle plugin, int numParams)
 	return pWrapper.CanBecomeRagdoll();
 }
 
-int Native_BecomeRagdollOnClient(Handle plugin, int numParams)
+any Native_BecomeRagdollOnClient(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(pWrapper))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
@@ -233,7 +259,109 @@ int Native_BecomeRagdollOnClient(Handle plugin, int numParams)
 	return pWrapper.BecomeRagdollOnClient(force);
 }
 
-bool ValidateAddress(CBaseAnimating wrapper)
+int Native_GetSequence(Handle plugin, int numParams)
 {
-	return wrapper.Pointer != Address_Null ? true : false;
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	return pWrapper.m_nSequence;
+}
+
+int Native_SetSequence(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	pWrapper.m_nSequence = iSequence;
+
+	return 0;
+}
+
+int Native_GetSequenceName(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+
+	int maxlength;
+	GetNativeStringLength(3, maxlength);
+	maxlength += 1;
+	char[] name = new char[maxlength];
+	GetNativeString(3, name, maxlength + 1);
+
+	pWrapper.GetSequenceName(iSequence, name, maxlength);
+	SetNativeString(3, name, maxlength + 1);
+
+	return 0;
+}
+
+int Native_GetSequenceActivity(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+
+	return pWrapper.GetSequenceActivity(iSequence);
+}
+
+int Native_GetSequenceActivityName(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+
+	int maxlength;
+	GetNativeStringLength(3, maxlength);
+	maxlength += 1;
+	char[] name = new char[maxlength];
+	GetNativeString(3, name, maxlength + 1);
+
+	pWrapper.GetSequenceActivityName(iSequence, name, maxlength);
+	SetNativeString(3, name, maxlength + 1);
+
+	return 0;
+}
+
+any Native_GetSequenceKeyValues(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	return pWrapper.GetSequenceKeyValues(iSequence);
+}
+
+int Native_GetSequenceLinearMotion(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	float vec[3];
+
+	pWrapper.GetSequenceLinearMotion(iSequence, vec);
+	SetNativeArray(3, vec, sizeof(vec));
+	return 0;
+}
+
+any Native_GetSequenceMoveYaw(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	return pWrapper.GetSequenceMoveYaw(iSequence);
+}
+
+any Native_GetSequenceMoveDist(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(pWrapper))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	return pWrapper.GetSequenceMoveDist(iSequence);
 }

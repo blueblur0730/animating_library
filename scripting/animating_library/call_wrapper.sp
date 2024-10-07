@@ -67,6 +67,46 @@ methodmap CBaseAnimating
 	public bool BecomeRagdollOnClient(float force[3]) {
 		return SDKCall(g_hSDKCall_BecomeRagdollOnClient, view_as<Address>(this), force);
 	}
+
+	property int m_nSequence {
+		public get() {
+			return GetEntProp(this.Entity, Prop_Send, "m_nSequence");
+		}
+
+		public set(int sequence) {
+			SDKCall(g_hSDKCall_SetSequence, view_as<Address>(this), sequence);
+		}
+	}
+
+	public void GetSequenceName(int sequence, char[] name, int maxlen) {
+		SDKCall(g_hSDKCall_GetSequenceName, view_as<Address>(this), sequence, name, maxlen);
+	}
+
+	public int GetSequenceActivity(int sequence) {
+		return SDKCall(g_hSDKCall_GetSequenceActivity, view_as<Address>(this), sequence);
+	}
+
+	public void GetSequenceActivityName(int sequence, char[] name, int maxlen) {
+		SDKCall(g_hSDKCall_GetSequenceActivityName, view_as<Address>(this), sequence, name, maxlen);
+	}
+
+	public Address GetSequenceKeyValues(int sequence) {
+		return view_as<Address>(SDKCall(g_hSDKCall_GetSequenceKeyValues, view_as<Address>(this), sequence));
+	}
+
+	public void GetSequenceLinearMotion(int sequence, float vec[3]) {
+		SDKCall(g_hSDKCall_GetSequenceLinearMotion, view_as<Address>(this), sequence, vec);
+	}
+
+	public float GetSequenceMoveYaw(int sequence) {
+		return SDKCall(g_hSDKCall_GetSequenceMoveYaw, view_as<Address>(this), sequence);
+	}
+
+	public float GetSequenceMoveDist(int sequence) {
+		float vec[3];
+		this.GetSequenceLinearMotion(sequence, vec);
+		return GetVectorLength(vec);
+	}
 }
 
 void CreateSDKCalls()
@@ -79,14 +119,13 @@ void CreateSDKCalls()
 	g_hSDKCall_GetBaseAnimating	  		= gd.CreateSDKCallOrFail(SDKCall_Entity, SDKConf_Virtual, "CBaseAnimating::GetBaseAnimating", _, _, true, ret);
 		
 	SDKCallParamsWrapper params2[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_Plain }};
-	SDKCallParamsWrapper ret3 			= { SDKType_PlainOldData, SDKPass_Plain };
-	g_hSDKCall_SetBodyGroup				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SetBodyGroup", params2, sizeof(params2), true, ret3);
+	g_hSDKCall_SetBodyGroup				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SetBodyGroup", params2, sizeof(params2), false, _);
 
 	SDKCallParamsWrapper params3[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }};
 	SDKCallParamsWrapper ret4 			= { SDKType_PlainOldData, SDKPass_Plain };
 	g_hSDKCall_GetBodyGroup				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBodyGroup", params3, sizeof(params3), true, ret4);
 
-	SDKCallParamsWrapper params4[] 		= {{ SDKType_PlainOldData, SDKPass_Plain },{  SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper params4[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_Plain }};
 	SDKCallParamsWrapper ret5 			= { SDKType_String, SDKPass_Pointer };
 	g_hSDKCall_GetBodyGroupPartName		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBodyGroupPartName", params4, sizeof(params4), true, ret5);
 
@@ -108,6 +147,25 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper ret12 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_BecomeRagdollOnClient	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::BecomeRagdollOnClient", params9, sizeof(params9), true, ret12);
 
+	SDKCallParamsWrapper params10[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	g_hSDKCall_SetSequence				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SetSequence", params10, sizeof(params10), false, _);
+
+	SDKCallParamsWrapper params12[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret14 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetSequenceActivity		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceActivity", params12, sizeof(params12), true, ret14);
+
+	SDKCallParamsWrapper params14[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret16 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetSequenceKeyValues		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceKeyValues", params14, sizeof(params14), true, ret16);
+
+	SDKCallParamsWrapper params15[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret17 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_GetSequenceMoveYaw		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceMoveYaw", params15, sizeof(params15), true, ret17);
+
+	SDKCallParamsWrapper params16[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_Pointer }};
+	g_hSDKCall_GetSequenceLinearMotion	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceLinearMotion", params16, sizeof(params16), false, _);
+
+
 	switch (gd.OS)
 	{
 		case OS_Windows:
@@ -123,6 +181,14 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params8[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret10 			= { SDKType_String, SDKPass_Pointer };
 			g_hSDKCall_GetBodyGroupName			= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetBodyGroupName", params8, sizeof(params8), true, ret10);
+
+			SDKCallParamsWrapper params11[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret13 			= { SDKType_String, SDKPass_Pointer };
+			g_hSDKCall_GetSequenceName			= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetSequenceName", params11, sizeof(params11), true, ret13);
+
+			SDKCallParamsWrapper params13[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret15 			= { SDKType_String, SDKPass_Pointer };
+			g_hSDKCall_GetSequenceActivityName	= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetSequenceActivityName", params13, sizeof(params13), true, ret15);
 		}
 
 		case OS_Linux:
@@ -138,6 +204,14 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params8[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret10 			= { SDKType_String, SDKPass_Pointer };
 			g_hSDKCall_GetBodyGroupName			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBodyGroupName", params8, sizeof(params8), true, ret10);
+
+			SDKCallParamsWrapper params11[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret13 			= { SDKType_String, SDKPass_Pointer };
+			g_hSDKCall_GetSequenceName			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceName", params11, sizeof(params11), true, ret13);
+
+			SDKCallParamsWrapper params13[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+			SDKCallParamsWrapper ret15 			= { SDKType_String, SDKPass_Pointer };
+			g_hSDKCall_GetSequenceActivityName	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetSequenceActivityName", params13, sizeof(params13), true, ret15);
 		}
 	}
 
@@ -160,4 +234,14 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.IsRagdoll", Native_IsRagdoll);
 	CreateNative("CBaseAnimating.CanBecomeRagdoll", Native_CanBecomeRagdoll);
 	CreateNative("CBaseAnimating.BecomeRagdollOnClient", Native_BecomeRagdollOnClient);
+
+	CreateNative("CBaseAnimating.m_nSequence.get", Native_GetSequence);
+	CreateNative("CBaseAnimating.m_nSequence.set", Native_SetSequence);
+	CreateNative("CBaseAnimating.GetSequenceName", Native_GetSequenceName);
+	CreateNative("CBaseAnimating.GetSequenceActivity", Native_GetSequenceActivity);
+	CreateNative("CBaseAnimating.GetSequenceActivityName", Native_GetSequenceActivityName);
+	CreateNative("CBaseAnimating.GetSequenceKeyValues", Native_GetSequenceKeyValues);
+	CreateNative("CBaseAnimating.GetSequenceLinearMotion", Native_GetSequenceLinearMotion);
+	CreateNative("CBaseAnimating.GetSequenceMoveYaw", Native_GetSequenceMoveYaw);
+	CreateNative("CBaseAnimating.GetSequenceMoveDist", Native_GetSequenceMoveDist);
 }

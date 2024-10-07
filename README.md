@@ -31,3 +31,15 @@
     1. IsRagdoll
     2. CanBecomeRagdoll
     3. BecomeRagdollOnClient
+
+- 10/7/24: v1.3
+  - Natives:
+    1. CBaseAnimating.m_nSequence.get
+    2. CBaseAnimating.m_nSequence.set
+    3. CBaseAnimating.GetSequenceName
+    4. CBaseAnimating.GetSequenceActivity
+    5. CBaseAnimating.GetSequenceActivityName
+    6. CBaseAnimating.GetSequenceKeyValues
+    7. CBaseAnimating.GetSequenceLinearMotion
+    8. CBaseAnimating.GetSequenceMoveYaw
+    9. CBaseAnimating.GetSequenceMoveDist

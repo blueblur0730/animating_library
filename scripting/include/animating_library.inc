@@ -10,13 +10,14 @@
  * It also enables entities to display a studio model.
  * For most of their original functions, please see here:
  * https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/server/baseanimating.cpp
+ * https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/baseanimating.h
  * 
  * Garry's Mod Wiki as reference:
  * https://wiki.facepunch.com/gmod/Entity
  * 
  * For weapons, specifies the world model(w_model) and the view model(v_model) when using the natives.
  * 
- * We will use the decriptings from Garry's Mod Wiki as reference.
+ * We will use the decriptions from Garry's Mod Wiki as reference.
 */
 
 methodmap CBaseAnimating
@@ -27,7 +28,7 @@ methodmap CBaseAnimating
     /**
      * Creates a new CBaseAnimating instance. Use this before use any of the native functions below.
      * 
-     * @param entity    The entity index of the instance.
+     * @param entity    The entity index of the instance. (must have a model)
      * 
      * @return          A CBaseAnimating pointer address.
      */
@@ -52,7 +53,7 @@ methodmap CBaseAnimating
     /**
      * Sets the given Body Group ID to the given value.
      * 
-     * @note            From the SDK: "// SetBodygroup is not supported on pending dynamic models. Wait for it to load!"
+     * @note            From the SDK: "SetBodygroup is not supported on pending dynamic models. Wait for it to load!"
      * @note            iValue is actually a boolean arugument. only 0 or 1 is allowed.
      * 
      * @param iGroup    The Body Group ID to set. Starting from 0.
@@ -104,7 +105,6 @@ methodmap CBaseAnimating
      * 
      * @noreturn
     */
-    // L4D2 / Alien Swarm: Reactive Drop / TF2 vscript function.
     public native void GetBodyPartName(int iGroup, int iPart, char[] name);
 
     /**
@@ -188,7 +188,98 @@ methodmap CBaseAnimating
      * 
      * @return          True if the entity is successfully made a ragdoll, false otherwise.
     */
-    public native bool BecomeRagdollOnClient(float force[3] = {0,0,0});
+    public native bool BecomeRagdollOnClient(float force[3] = {0.0, 0.0, 0.0});
+
+    /*<---------------->*/
+    /* Sequence Related */
+
+    /**
+     * Get/Set the value of m_nSequence.
+     * 
+     * @note            set() uses SDKCall function.
+    */
+    property int m_nSequence {
+        public native get();
+        public native set(int sequence);
+    }
+
+    /**
+     * Return the name of the sequence for the index provided.
+     * 
+     * @param sequence  The index of the sequence to get the name of.
+     * @param name      The buffer to store the name of the sequence.
+     * 
+     * @noreturn
+    */
+    public native void GetSequenceName(int sequence, char[] name);
+
+    /**
+     * Return activity id out of sequence id.
+     * 
+     * @note            For activity id, see left4dhooks_anim.inc
+     * 
+     * @param sequence  The index of the sequence to get the activity of.
+     * 
+     * @return          The activity id of the sequence.
+    */
+    public native int GetSequenceActivity(int sequence);
+
+    /**
+     * Returns the activity name for the given sequence id.
+     * 
+     * @param sequence  The index of the sequence to get the activity name of.
+     * @param name      The buffer to store the name of the activity.
+     * 
+     * @noreturn
+    */
+    public native void GetSequenceActivityName(int sequence, char[] name);
+
+    /**
+     * Returns the internal keyvalues pointer address for the given sequence id.
+     * 
+     * @param sequence  The index of the sequence to get the keyvalues of.
+     * 
+     * @return          The internal keyvalues pointer address.
+    */
+    public native Address GetSequenceKeyValues(int sequence);
+    // public native SourceKeyValues GetSequenceKeyValues(int sequence);
+    // see l4d2_source_keyvalues by fdxx.
+
+    /**
+     * Gets a Vector which describes the sequence's extracted motion over its entire duration.
+     * 
+     * @note            Bad sequence number will log the error message to the console and return nothing.
+     * 
+     * @param sequence  The index of the sequence to get the motion of.
+     * @param vec       The buffer to store the motion vector.
+     * 
+     * @noreturn
+    */
+    public native void GetSequenceLinearMotion(int sequence, float vec[3])
+
+    /**
+     * Returns the change in heading direction in between the start and the end of the sequence.
+     * 
+     * @note            Bad sequence number will log the error message to the console and return nothing.
+     * 
+     * @param sequence  The index of the sequence to get the motion of.
+     * 
+     * @return          A yaw angle of the vector returned by GetSequenceLinearMotion().
+     *                  99999(NOMOTION) if the sequence has no motion.
+    */
+    public native float GetSequenceMoveYaw(int sequence);
+
+    /**
+     * Returns an entity's sequence move distance (the change in position over the course of the entire sequence).
+     * 
+     * @note            Bad sequence number will log the error message to the console and return nothing.
+     * @note            Returns the length of the vector returned by GetSequenceLinearMotion().
+     * 
+     * @param sequence  The index of the sequence to get the motion of.
+     * 
+     * @return          The distance the entity moved over the course of the sequence.
+    */
+    public native float GetSequenceMoveDist(int sequence);
 }
 
 public SharedPlugin __pl_animating_library = 

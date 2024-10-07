@@ -57,6 +57,36 @@
                     "offset"    "0xB1"  // sub_10403930+B1   E8 AA F1 C2 FF                    call    sub_10032B90
                 }
             }
+
+            "CBaseAnimating::GetSequenceName"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::GetSequenceName"
+                }
+
+                "windows"
+                {
+                    "signature" "GetScriptDesc<CBaseAnimating>"
+                    "offset"    "0x411" // sub_10038EB0+411  C7 46 28 70 1A 03 10                 mov     dword ptr [esi+28h], offset sub_10031A70
+                }
+            }
+
+            "CBaseAnimating::GetSequenceActivityName"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::GetSequenceActivityName"
+                }
+
+                "windows"
+                {
+                    "signature" "GetScriptDesc<CBaseAnimating>"
+                    "offset"    "0x3C0" // sub_10038EB0+3C0  C7 46 28 D0 1A 03 10                mov     dword ptr [esi+28h], offset sub_10031AD0
+                }
+            }
+
+
         }
 
         "Offsets"
@@ -215,6 +245,74 @@
                 /* 55 8B EC 83 EC 20 8B 45 08 53 */
             }
 
+            // windows sig:
+            // search for string "shoved_backward_04j" to find ZombieBotBody::StartActivity
+            // down below the string "" there is a call pass the a1 array parameter with index[22] that is it. (sub_10036AA0(a1[22]);)
+            "CBaseAnimating::SetSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating11SetSequenceEi"
+                "windows"   "\x55\x8B\xEC\x53\x8B\x5D\x08\x56\x8B\xF1\x57\x8B\xBE\x80\x04\x00\x00"
+                /* 55 8B EC 53 8B 5D 08 56 8B F1 57 8B BE 80 04 00 00 */
+            }
+
+            "CBaseAnimating::GetSequenceName"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating15GetSequenceNameEi"
+            }
+
+            // windows sig:
+            // search for string "%f: Infected %d(%s): main sequence is %d\n" or "layer %d: sequence %d(%s), start time %f, order %d, looping %d\n"
+            // (I suggest you just copy a sentence from the string and put it in search because I dont know the god damn why the whole string just keeping fail.)
+            // the first call is the 'for' statement "for ( i = 0; i < this[1865]; v4 += 24 )" is CBaseAnimating::GetSequenceActivity.
+            "CBaseAnimating::GetSequenceActivity"
+            {
+                "libray"    "server"
+                "linux"     "@_ZN14CBaseAnimating19GetSequenceActivityEi"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x8B\xF1\x83\xFF\xFF\x75\x2A\x5F\x83\xC8\xFF"
+                /* 55 8B EC 56 57 8B 7D 08 8B F1 83 FF FF 75 ? 5F 83 C8 FF */
+            }
+
+            "CBaseAnimating::GetSequenceActivityName"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating23GetSequenceActivityNameEi"
+            }
+
+            // windows sig:
+            // search for string "CSceneEntity %s :\"%s\" unable to find gesture \"%s\"\n" or "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n"
+            // to find CBaseFlex::HandleStartGestureSceneEvent
+            // right on the top of the string "faceposer", on the top of the statement "if ( j != 0.0 )", the call gives its vallue to 'j' is the call CBaseAnimating::GetSequenceKeyValues
+            "CBaseAnimating::GetSequenceKeyValues"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating20GetSequenceKeyValuesEi"
+                "windows"   "\x55\x8B\xEC\x51\x53\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00"
+                /* 55 8B EC 51 53 56 8B F1 83 BE D0 13 00 00 00 */
+            }
+
+            // windows sig:
+            // find CBaseAnimating::GetGroundSpeedVelocity in the vtable with offset 221 (for now), which is the only function that calls us. (ignore the null_)
+            // in the second 'if' statement, the first call is our target.
+            "CBaseAnimating::GetSequenceMoveYaw"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating18GetSequenceMoveYawEi"
+                "windows"   "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x83\xEC\x2C\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00"
+                /* 53 8B DC 83 EC 08 83 E4 F0 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 2C 56 8B F1 83 BE D0 13 00 00 00 */
+            }
+
+            // windows sig:
+            // find TankLocomotion::ClimbUpToLedge with string "HulkZombie.StartLedgeClimb", (two call, one of them.)
+            // down there where string is, the first call in the statement "if ( v27 != 719 )" is CBaseAnimating::GetSequenceLinearMotion.
+            "CBaseAnimating::GetSequenceLinearMotion"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating23GetSequenceLinearMotionEiP6Vector"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x0C"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 0C */
+            }
         }
     }
 }
