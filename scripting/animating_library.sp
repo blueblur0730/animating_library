@@ -7,12 +7,14 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.4.4"
+#define PLUGIN_VERSION "1.5"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
 	g_hSDKCall_ModelSoundCache_FinishModel = null,
+
+	g_hSDKCall_GetSequenceFlags			= null,
 
 	g_hSDKCall_GetBaseAnimating		  	= null,
 	g_hSDKCall_FindBodyGroupByName	  	= null,
@@ -38,11 +40,16 @@ Handle
 	g_hSDKCall_GetSequenceMovement		= null,
 	g_hSDKCall_SequenceDuration			= null,
 	g_hSDKCall_LookupSequence			= null,
-	g_hSDKCall_IsValidSequence			= null;
+	g_hSDKCall_IsValidSequence			= null,
+	g_hSDKCall_ResetSequence			= null,
+	g_hSDKCall_ResetSequenceInfo		= null,
+	g_hSDKCall_FindTransitionSequence	= null,
+	g_hSDKCall_GoToSequence				= null;
 
 #include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"
 #include "animating_library/cstudiohdr.sp"
+#include "animating_library/animation.sp"
 
 public Plugin myinfo =
 {

@@ -92,3 +92,12 @@
     1. Removed all methodmap wrappers. Since there may be a potential issue when creating multiple instances in other plugins which calls the APIs from animating_library. For best stability and safty, we manually call the SDKCalls inside of native functions itself.
     2. Added IsValidEntity() check for CBaseAnimating and CStudioHdr instance creating.
     3. Fixed extra arg in IsSequenceFinished.
+
+- 10/9/24: v1.5
+  - Natives:
+    1. CBaseAnimating.IsSequenceLooping
+    2. CBaseAnimating.ResetSequence
+    3. CBaseAnimating.ResetSequenceInfo
+    4. CBaseAnimating.FindTransitionSequence
+    5. CBaseAnimating.GoToSequence
+    6. GetSequenceFlags

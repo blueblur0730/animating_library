@@ -72,6 +72,25 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper ret21 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_IsValidSequence			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::IsValidSequence", params20, sizeof(params20), true, ret21);
 
+	SDKCallParamsWrapper params21[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }, {SDKType_PlainOldData, SDKPass_Plain}};
+	SDKCallParamsWrapper ret22 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetSequenceFlags			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "GetSequenceFlags", params21, sizeof(params21), true, ret22);
+
+	SDKCallParamsWrapper params22[] 	= {{SDKType_PlainOldData, SDKPass_Plain}};
+	g_hSDKCall_ResetSequence			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::ResetSequence", params22, sizeof(params22), false, _);
+
+	g_hSDKCall_ResetSequenceInfo		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::ResetSequenceInfo", _, _, false, _);
+
+	SDKCallParamsWrapper params23[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL }};
+	SDKCallParamsWrapper ret24 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_FindTransitionSequence	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::FindTransitionSequence", params23, sizeof(params23), true, ret24);
+
+	SDKCallParamsWrapper params24[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Float, SDKPass_Plain }, { SDKType_Float, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_Plain }, { SDKType_PlainOldData, SDKPass_ByRef }, { SDKType_Float, SDKPass_ByRef }, { SDKType_PlainOldData, SDKPass_ByRef }};
+	SDKCallParamsWrapper ret25 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_GoToSequence				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GoToSequence", params24, sizeof(params24), true, ret25);
+
+
+
 	switch (gd.OS)
 	{
 		case OS_Windows:
@@ -175,6 +194,13 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.LookupSequence", Native_LookupSequence);
 	CreateNative("CBaseAnimating.IsValidSequence", Native_IsValidSequence);
 	CreateNative("CBaseAnimating.IsSequenceFinished", Native_IsSequenceFinished);
+	CreateNative("CBaseAnimating.IsSequenceLooping", Native_IsSequenceLooping);
+	CreateNative("CBaseAnimating.ResetSequence", Native_ResetSequence);
+	CreateNative("CBaseAnimating.ResetSequenceInfo", Native_ResetSequenceInfo);
+	CreateNative("CBaseAnimating.FindTransitionSequence", Native_FindTransitionSequence);
+	CreateNative("CBaseAnimating.GoToSequence", Native_GoToSequence);
+
+	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 
 	CreateNative("CStudioHdr.CStudioHdr", Native_CStudioHdr);
 	CreateNative("CStudioHdr.deleteThis", Native_CStudioHdr_DeleteThis);

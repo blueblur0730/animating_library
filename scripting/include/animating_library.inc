@@ -20,6 +20,24 @@
  * We will use the decriptions from Garry's Mod Wiki as reference.
 */
 
+// sequence flags
+// See here: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/public/studio.h#L2936
+#define STUDIO_LOOPING	    (1 << 0)		// ending frame should be the same as the starting frame
+#define STUDIO_SNAP		    (1 << 1)		// do not interpolate between previous animation and this one
+#define STUDIO_DELTA	    (1 << 2)		// this sequence "adds" to the base sequences, not slerp blends
+#define STUDIO_AUTOPLAY	    (1 << 3)		// temporary flag that forces the sequence to always play
+#define STUDIO_POST		    (1 << 4)		// 
+#define STUDIO_ALLZEROS	    (1 << 5)		// this animation/sequence has no real animation data
+//						    (1 << 6)
+#define STUDIO_CYCLEPOSE    (1 << 7)		// cycle index is taken from a pose parameter index
+#define STUDIO_REALTIME	    (1 << 8)		// cycle index is taken from a real-time clock, not the animations cycle index
+#define STUDIO_LOCAL	    (1 << 9)		// sequence has a local context sequence
+#define STUDIO_HIDDEN	    (1 << 10)		// don't show in default selection views
+#define STUDIO_OVERRIDE	    (1 << 11)		// a forward declared sequence (empty)
+#define STUDIO_ACTIVITY	    (1 << 12)		// Has been updated at runtime to activity index
+#define STUDIO_EVENT	    (1 << 13)		// Has been updated at runtime to event index
+#define STUDIO_WORLD	    (1 << 14)		// sequence blends in worldspace
+
 methodmap CBaseAnimating
 {
     /*<---------------------------->*/
@@ -195,6 +213,9 @@ methodmap CBaseAnimating
 
     // see documenation here:
     // https://developer.valvesoftware.com/wiki/$sequence
+    // https://developer.valvesoftware.com/wiki/CBaseAnimating
+    // https://srcents.miraheze.org/wiki/CBaseAnimating
+    // https://developer.valvesoftware.com/wiki/Animating_a_model
 
     // Any sequence number should be >= 0.
     // bad seqeunce number may cause some unknown errors.
@@ -330,6 +351,8 @@ methodmap CBaseAnimating
     /**
      * Returns the ground speed of the entity's sequence.
      * 
+     * @note            m_flGroundSpeed = GetSequenceGroundSpeed() * m_flModelScale
+     * 
      * @param sequence  The index of the sequence to get the ground speed of.
      * 
      * @return          The ground speed of the sequence in units per second.
@@ -362,16 +385,93 @@ methodmap CBaseAnimating
     public native bool IsValidSequence(int sequence);
 
     /**
-     * Returns whether the entity's current sequence is finished or not.
+     * Returns whether the entity's current sequence is finished or not. (m_bSequenceFinished)
+     * 
+     * @note            Uses SDKCall. or you can use GetEntProp youself.
      * 
      * @return          True if the sequence is finished, false otherwise.
     */
     public native bool IsSequenceFinished();
 
     /**
-     * Checks if a sequence is looping
+     * Checks if a sequence has looping flag or not. (m_bSequenceLoops)
+     * 
+     * @note            Uses SDKCall. or you can use GetEntProp youself.
+     * @note            See 'struct mstudioseqdesc_t' (sequence descriptions) here: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/public/studio.h#L779
+     * 
+     * @param sequence  The index of the sequence to check.
+     * 
+     * @return          True if the sequence has looping flag, false otherwise.
     */
+    public native bool IsSequenceLooping(int sequence);
+
+    /**
+     * Reset a sequence by sequence ID. If the ID is different than the current sequence, switch to the new sequence.
+     * 
+     * @note            The informations below is from Garry's Mod Wiki:
+     * @note            "Plays an animation on the entity. This may not always work on engine entities."
+     * @note            "This will not reset the animation on viewmodels, use (in c++) CBaseViewModel::SendViewModelMatchingSequence instead."
+     * @note            "This will not work properly if called directly after calling (in c++) CBaseAnimating::SetModel. Consider waiting until the next Tick."
+     * 
+     * @param sequence  The index of the sequence to play.
+     * 
+     * @noreturn
+    */
+    public native void ResetSequence(int sequence);
+
+    /**
+     * Reset entity sequence info such as playback rate, ground speed, last event check, etc.
+     * 
+     * @note            See: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/game/server/baseanimating.cpp#L883
+     * 
+     * @noreturn
+    */
+    public native void ResetSequenceInfo();
+
+    /**
+     * Returns a transition from the given start and end sequence.
+     * 
+     * @note                    From Garry's Mod Wiki: "This function was only used by HL1 entities and NPCs, before the advent of sequence blending and gestures."
+     * @note                    https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/game/server/baseanimating.cpp#L2092
+     * @note                    https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/shared/animation.cpp#L616
+     * 
+     * @param iCurrentSequence  The index of The currently playing sequence
+     * @param iGoalSequence     The index of the goal sequence.
+     * 
+     * @return                  The transition sequence, -1 if not available.
+    */
+    public native int FindTransitionSequence(int iCurrentSequence, int iGoalSequence);
+
+    /**
+     * No description found for now. In L4D2 this is called by CDynamicProp::PropSetSequence.
+     * 
+     * @note                    See: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/shared/animation.cpp#L701
+     * 
+     * @param iCurrentSequence  The index of The currently playing sequence (m_nSequence)
+     * @param flCurrentCycle    The current cycle of the sequence.  (m_flCycle)
+     * @param flCurrentRate     The current playback rate of the sequence. (m_flPlaybackRate)
+     * @param iGoalSequence     The index of the goal sequence. (m_iGoalSequence)
+     * @param nNextSequence     ?.
+     * @param flNextCycle       ?.
+     * @param iNextDir          ? (m_iTransitionDirection).
+     * 
+     * @return                  True if the operation was successful, false otherwise.
+    */
+    public native bool GoToSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir)
 }
+
+/**
+ * Returns the flags number of the given sequence.
+ * 
+ * @note            See flags in the head of this file.
+ * 
+ * @param entity    The entity index to get the flags of its model's sequence.
+ * @param sequence  The index of the sequence to get the flags of.
+ * 
+ * @return          The flags number of the given sequence.
+*/
+native int GetSequenceFlags(int entity, int sequence);
+
 
 methodmap CStudioHdr
 {
@@ -445,6 +545,13 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.LookupSequence");
     MarkNativeAsOptional("CBaseAnimating.IsValidSequence");
     MarkNativeAsOptional("CBaseAnimating.IsSequenceFinished");
+    MarkNativeAsOptional("CBaseAnimating.IsSequenceLooping");
+    MarkNativeAsOptional("CBaseAnimating.ResetSequence");
+    MarkNativeAsOptional("CBaseAnimating.ResetSequenceInfo");
+    MarkNativeAsOptional("CBaseAnimating.FindTransitionSequence");
+    MarkNativeAsOptional("CBaseAnimating.GoToSequence");
+
+    MarkNativeAsOptional("GetSequenceFlags");
 
     MarkNativeAsOptional("CStudioHdr.CStudioHdr");
     MarkNativeAsOptional("CStudioHdr.deleteThis");

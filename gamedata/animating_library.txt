@@ -12,6 +12,11 @@
 		}
 	}
 
+    //-------------------------------------------------------------
+    // feel free to use any of these signatures if you need one. 
+    // all found by blueblur.
+    //-------------------------------------------------------------
+
     "left4dead2"
     {
         "Addresses"
@@ -394,6 +399,62 @@
                 "linux"     "@_ZN14CBaseAnimating14IsValidSequenceEi"
                 "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x8E\xD0\x13\x00\x00\x85\xC9"
                 /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 8E D0 13 00 00 85 C9 */
+            }
+
+            // windows sig:
+            // search for string "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n" to find CBaseFlex::HandleStartGestureSceneEvent
+            // (or any other long strings)
+            // down the buttom of the function, this string (above) is in a 'if' statement, the call in the statement is GetSequenceFlags.
+            "GetSequenceFlags"
+            {
+                "library"   "server"
+                "linux"     "@_Z16GetSequenceFlagsP10CStudioHdri"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x85\xFF\x74\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x84\xC0\x74\x2A\x8B\x75\x0C\x85\xF6\x78\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x3B\xF0\x7D\x2A\x56\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x8B\x40\x0C"
+                /*  55 8B EC 56 57 8B 7D 08 85 FF 74 ? 8B CF E8 ? ? ? ? 84 C0 74 ? 8B 75 0C 85 F6 78 ? 8B CF E8 ? ? ? ? 3B F0 7D ? 56 8B CF E8 ? ? ? ? 8B 40 0C*/
+            }
+
+            // windows sig:
+            // search for string "ResetSequence : %s: %s -> %s\n"
+            "CBaseAnimating::ResetSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating14ResetSequenceEi"
+                "windows"   "\x55\x8B\xEC\x53\x56\x57\x8B\x7D\x08\x8B\x07\x8B\x50\x1C"
+                /* 55 8B EC 53 56 57 8B 7D 08 8B 07 8B 50 1C */
+            }
+
+            // windows sig:
+            // search for string "ResetSequenceInfo"
+            "CBaseAnimating::ResetSequenceInfo"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating17ResetSequenceInfoEv"
+                "windows"   "\xA1\x2A\x2A\x2A\x2A\x83\x78\x30\x00\x53\x56\x8B\xF1"
+                /* A1 ? ? ? ? 83 78 30 00 53 56 8B F1 */
+            }
+
+            // windows sig:
+            // find CBaseAnimating::ResetSequenceInfo, through xref it has 11 calls. the third call should be CBaseCombatWeapon::SetIdealActivity.
+            // the first call of this function which passes 3 params is it.
+            // (stop searching for cbaseentity's vtable it looks like a shit.)
+            "CBaseAnimating::FindTransitionSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating22FindTransitionSequenceEiiPi"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x10\x8B\xF1\x85\xFF\x75\x2A\x83\xBE\xD0\x13\x00\x00\x00"
+                /* 55 8B EC 56 57 8B 7D 10 8B F1 85 FF 75 ? 83 BE D0 13 00 00 00 */
+            }
+
+            // windows sig:
+            // find GoToSequence first by a string: "error in transition graph: %s to %s\n"
+            // it has two result, choose the one with 8 params.
+            // the only xref is CBaseAnimating::GotoSequence.
+            "CBaseAnimating::GotoSequence"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating12GotoSequenceEiffiRiRfS0_"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x20"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 20 */
             }
         }
     }

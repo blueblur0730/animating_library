@@ -1,5 +1,5 @@
 #if defined _animating_libarary_cbaseanimating_
-    #endinput
+	#endinput
 #endif
 #define _animating_libarary_cbaseanimating_
 
@@ -108,7 +108,7 @@ int Native_GetBodyGroupPartName(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
 	int iGroup = GetNativeCell(2);
-	int iPart = GetNativeCell(3);
+	int iPart  = GetNativeCell(3);
 
 	if (iGroup < 0)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid iGroup. Starting from 0.");
@@ -138,7 +138,7 @@ int Native_FindBodyGroupVariant(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iGroup = GetNativeCell(2);
+	int iGroup	 = GetNativeCell(2);
 	int iVariant = GetNativeCell(3);
 
 	if (iGroup < 0)
@@ -270,7 +270,7 @@ int Native_GetSequenceLinearMotion(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
+	int	  iSequence = GetNativeCell(2);
 	float vec[3];
 
 	SDKCall(g_hSDKCall_GetSequenceLinearMotion, GetNativeCell(1), iSequence, vec);
@@ -292,11 +292,11 @@ any Native_GetSequenceMoveDist(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
+	int	  iSequence = GetNativeCell(2);
 
 	float vec[3];
 	SDKCall(g_hSDKCall_GetSequenceLinearMotion, GetNativeCell(1), iSequence, vec);
-	
+
 	return GetVectorLength(vec);
 }
 
@@ -305,14 +305,14 @@ any Native_GetSequenceMovement(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
+	int	  iSequence = GetNativeCell(2);
 	float fromCycle = GetNativeCell(3);
-	float toCycle = GetNativeCell(4);
-	
+	float toCycle	= GetNativeCell(4);
+
 	float deltaVector[3];
 	float deltaAngles[3];
 
-	bool bFound = view_as<bool>(SDKCall(g_hSDKCall_GetSequenceMovement, GetNativeCell(1), iSequence, fromCycle, toCycle, deltaVector, deltaAngles));
+	bool  bFound = view_as<bool>(SDKCall(g_hSDKCall_GetSequenceMovement, GetNativeCell(1), iSequence, fromCycle, toCycle, deltaVector, deltaAngles));
 	SetNativeArray(5, deltaVector, sizeof(deltaVector));
 	SetNativeArray(6, deltaAngles, sizeof(deltaAngles));
 
@@ -324,11 +324,11 @@ any Native_SequenceDuration(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
-	int entity = EntRefToEntIndex(GetNativeCell(1));
+	int		iSequence  = GetNativeCell(2);
+	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
 	Address pStudioHdr = GetEntityCStudioHdr(entity);
-	float flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
+	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
 	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 	return flDuration;
 }
@@ -338,14 +338,14 @@ any Native_GetSequenceCycleRate(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
-	int entity = EntRefToEntIndex(GetNativeCell(1));
+	int		iSequence  = GetNativeCell(2);
+	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
 	Address pStudioHdr = GetEntityCStudioHdr(entity);
-	float flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
+	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
 	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
-	if (flDuration > 0.0) 
+	if (flDuration > 0.0)
 		return 1.0 / flDuration;
 
 	return 10.0;	// 1.0f / 0.1f;
@@ -356,11 +356,11 @@ any Native_GetSequenceGroundSpeed(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	int iSequence = GetNativeCell(2);
-	int entity = EntRefToEntIndex(GetNativeCell(1));
+	int		iSequence  = GetNativeCell(2);
+	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
 	Address pStudioHdr = GetEntityCStudioHdr(entity);
-	float flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
+	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
 	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	float vec[3];
@@ -370,7 +370,7 @@ any Native_GetSequenceGroundSpeed(Handle plugin, int numParams)
 	if (flDuration > 0.0)
 		return flMoveDist / flDuration;
 
-	return 0.0;	// 0
+	return 0.0;	   // 0
 }
 
 int Native_LookupSequence(Handle plugin, int numParams)
@@ -403,4 +403,85 @@ any Native_IsSequenceFinished(Handle plugin, int numParams)
 
 	int entity = EntRefToEntIndex(GetNativeCell(1));
 	return view_as<bool>(GetEntProp(entity, Prop_Send, "m_bSequenceFinished"));
+}
+
+any Native_IsSequenceLooping(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int entity	  = EntRefToEntIndex(GetNativeCell(1));
+	int iSequence = GetNativeCell(2);
+
+	if (!IsValidEntity(entity))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid entity index.");
+		return 0;
+	}
+
+	if (!HasModel(entity))
+	{
+		ThrowNativeError(SP_ERROR_PARAM, "Entity has no model.");
+		return 0;
+	}
+
+	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	int		flags	   = SDKCall(g_hSDKCall_GetSequenceFlags, pStudioHdr, iSequence);
+	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
+
+	return (flags & 1) != 0;	// STUDIO_LOOPING
+}
+
+int Native_ResetSequence(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	SDKCall(g_hSDKCall_ResetSequence, GetNativeCell(1), iSequence);
+
+	return 0;
+}
+
+int Native_ResetSequenceInfo(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	SDKCall(g_hSDKCall_ResetSequenceInfo, GetNativeCell(1));
+	return 0;
+}
+
+int Native_FindTransitionSequence(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iCurrentSequence = GetNativeCell(2);
+	int iGoalSequence	 = GetNativeCell(3);
+	int piDir			 = 0;	// passing null.
+
+	return SDKCall(g_hSDKCall_FindTransitionSequence, GetNativeCell(1), iCurrentSequence, iGoalSequence, piDir);
+}
+
+any Native_GoToSequence(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	float flCurrentCycle = GetNativeCell(3);
+	float flCurrentRate = GetNativeCell(4);
+	int iGoalSequence = GetNativeCell(5);
+	int nNextSequence = GetNativeCellRef(6);
+	float flNextCycle = GetNativeCellRef(7);
+	float iNextDir = GetNativeCellRef(8);
+
+	bool bFound = view_as<bool>(SDKCall(g_hSDKCall_GoToSequence, GetNativeCell(1), iSequence, flCurrentCycle, flCurrentRate, iGoalSequence, nNextSequence, flNextCycle, iNextDir));
+
+	SetNativeCellRef(6, nNextSequence);
+	SetNativeCellRef(7, flNextCycle);
+	SetNativeCellRef(8, iNextDir);
+
+	return bFound;
 }
