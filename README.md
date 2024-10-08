@@ -1,5 +1,8 @@
 # [L4D2/ANY?] Library for Animating
 
+## Notice
+- This branch is based on v1.4.3, which means all SDKCalls in plugin itself is made by methodmap wrappers. This branch should be seen as a backup since we have removed methodmap wrappers in case the bug of creating multiple instances from another plugin when calling APIs from animating_library.
+
 ### Introduction
 
 - Various internal functions of class CBaseAnimating or others. Currently supported L4D2.
