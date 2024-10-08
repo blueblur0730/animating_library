@@ -1,8 +1,8 @@
-# [L4D2/ANY?] Library for CBaseAnimating
+# [L4D2/ANY?] Library for Animating
 
 ### Introduction
 
-- Various internal functions of class CBaseAnimating. Currently supported L4D2.
+- Various internal functions of class CBaseAnimating or others. Currently supported L4D2.
 
 ### Note
 
