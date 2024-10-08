@@ -86,3 +86,9 @@
 - 10/8/24: v1.4.3
   - Changes:
     1. Fixed an issue related to GetSequenceMovement call setup.
+
+- 10/8/24: v1.4.4
+  - Changes:
+    1. Removed all methodmap wrappers. Since there may be a potential issue when creating multiple instances in other plugins which calls the APIs from animating_library. For best stability and safty, we manually call the SDKCalls inside of native functions itself.
+    2. Added IsValidEntity() check for CBaseAnimating and CStudioHdr instance creating.
+    3. Fixed extra arg in IsSequenceFinished.

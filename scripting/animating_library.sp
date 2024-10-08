@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.4.2"
+#define PLUGIN_VERSION "1.4.4"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
@@ -40,7 +40,7 @@ Handle
 	g_hSDKCall_LookupSequence			= null,
 	g_hSDKCall_IsValidSequence			= null;
 
-#include "animating_library/call_wrapper.sp"
+#include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"
 #include "animating_library/cstudiohdr.sp"
 
@@ -76,9 +76,9 @@ public void OnPluginStart()
 	CreateSDKCalls();
 }
 
-bool ValidateAddress(CBaseAnimating wrapper)
+bool ValidateAddress(Address pAdr)
 {
-	return wrapper.Pointer != Address_Null ? true : false;
+	return pAdr != Address_Null ? true : false;
 }
 
 bool HasModel(int entity)

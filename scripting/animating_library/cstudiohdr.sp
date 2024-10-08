@@ -3,22 +3,33 @@
 #endif
 #define _animating_libarary_cstudiohdr_
 
-#define MAX_ENTITIES 2048
-
-CStudioHdr pStudioHdr[MAX_ENTITIES + 1];
-
 any	Native_CStudioHdr(Handle plugin, int numParams)
 {
 	int entity = GetNativeCell(1);
-
-	pStudioHdr[entity] = CStudioHdr(entity);
-	return pStudioHdr[entity].Pointer;
+	return GetEntityCStudioHdr(entity);
 }
 
 int Native_CStudioHdr_DeleteThis(Handle plugin, int numParams)
 {
-	int entity = GetNativeCell(2);
+	Address pStudioHdrAdr = GetNativeCell(1);
+	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdrAdr);
 
-	pStudioHdr[entity].deleteThis();
 	return 0;
+}
+
+// Big thanks to LuqS
+// https://forums.alliedmods.net/showthread.php?t=333857
+Address GetEntityCStudioHdr(int entity)
+{
+	if (!IsValidEntity(entity))
+		return Address_Null;
+
+	char sModel[PLATFORM_MAX_PATH];
+	GetEntPropString(entity, Prop_Data, "m_ModelName", sModel, sizeof(sModel));
+
+	if (!sModel[0])
+		return Address_Null;
+
+	// Create a new CStudioHdr instance based on the model path.
+	return view_as<Address>(SDKCall(g_hSDKCall_ModelSoundCache_LoadModel, sModel));
 }

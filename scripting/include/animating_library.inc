@@ -364,11 +364,9 @@ methodmap CBaseAnimating
     /**
      * Returns whether the entity's current sequence is finished or not.
      * 
-     * @param sequence  The index of the sequence to check.
-     * 
      * @return          True if the sequence is finished, false otherwise.
     */
-    public native bool IsSequenceFinished(int sequence);
+    public native bool IsSequenceFinished();
 
     /**
      * Checks if a sequence is looping
@@ -399,7 +397,7 @@ methodmap CStudioHdr
      * 
      * @noreturn
     */
-    public native void deleteThis(int entity);
+    public native void deleteThis();
 }
 
 public SharedPlugin __pl_animating_library = 
