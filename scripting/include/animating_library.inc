@@ -371,8 +371,35 @@ methodmap CBaseAnimating
     public native bool IsSequenceFinished(int sequence);
 
     /**
-     * Checks if a sequence is 
+     * Checks if a sequence is looping
     */
+}
+
+methodmap CStudioHdr
+{
+    /*<------------------------>*/
+    /* CStudioHdr Constructor */
+
+    /**
+     * Creates a new CStudioHdr instance based on the model path.
+     * 
+     * @note            Calls operator new to allocate memory for the instance. Must be freed using deleteThis().
+     * 
+     * @param entity    The entity index to create for. (must have a model)
+     * 
+     * @return          A CStudioHdr pointer address.
+     *                  Address_Null if the entity has no model, or SDKCall failed.
+    */
+    public native CStudioHdr(int entity);
+
+    /**
+     * Frees the memory allocated for the CStudioHdr instance created for an entity.
+     * 
+     * @note            Even if the game itself will check if the pointer is null or not, it's still a good practice to free the memory manully.
+     * 
+     * @noreturn
+    */
+    public native void deleteThis(int entity);
 }
 
 public SharedPlugin __pl_animating_library = 
@@ -420,5 +447,8 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.LookupSequence");
     MarkNativeAsOptional("CBaseAnimating.IsValidSequence");
     MarkNativeAsOptional("CBaseAnimating.IsSequenceFinished");
+
+    MarkNativeAsOptional("CStudioHdr.CStudioHdr");
+    MarkNativeAsOptional("CStudioHdr.deleteThis");
 }
 #endif

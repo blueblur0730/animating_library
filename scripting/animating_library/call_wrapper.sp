@@ -115,7 +115,10 @@ methodmap CBaseAnimating
 	}
 
 	public float SequenceDuration(int sequence) {
-		return SDKCall(g_hSDKCall_SequenceDuration, view_as<Address>(this), CStudioHdr(this.Entity).Pointer, sequence);
+		CStudioHdr pStudioHdr = CStudioHdr(this.Entity);
+		float flDuration = SDKCall(g_hSDKCall_SequenceDuration, view_as<Address>(this), pStudioHdr.Pointer, sequence);
+		pStudioHdr.deleteThis();
+		return flDuration;
 	}
 	
 	public float GetSequenceCycleRate(int sequence) {
@@ -149,13 +152,20 @@ methodmap CBaseAnimating
 
 methodmap CStudioHdr
 {
-	// retrieves the CStudioHdr pointer based on the entity's model.
+	// retrieves the CStudioHdr pointer based on the entity's model. 
+	// note: This will calls operator new to create a new instance.
+	// must free the memory manually using delete.
 	public CStudioHdr(int entity) {
 		return view_as<CStudioHdr>(GetEntityCStudioHdr(entity));
 	}
 
 	property Address Pointer {
 		public get() { return view_as<Address>(this); }
+	}
+
+	// Delete the CStudioHdr instance to not leak memory.
+	public void deleteThis() {
+		SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, view_as<Address>(this));
 	}
 }
 
@@ -292,9 +302,9 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 {
 	SDKCallParamsWrapper params[] 			= {{ SDKType_String, SDKPass_Pointer }};
 	SDKCallParamsWrapper ret 				= { SDKType_PlainOldData, SDKPass_Plain };
-	g_hSDKCall_ModelSoundCache_LoadModel 	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_LoadModel", params, sizeof(params), true, ret);
+	g_hSDKCall_ModelSoundCache_LoadModel 	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ModelSoundsCache_LoadModel", params, sizeof(params), true, ret);
 
-	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Pointer }};
 	g_hSDKCall_ModelSoundCache_FinishModel = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
 }
 
@@ -331,6 +341,9 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.LookupSequence", Native_LookupSequence);
 	CreateNative("CBaseAnimating.IsValidSequence", Native_IsValidSequence);
 	CreateNative("CBaseAnimating.IsSequenceFinished", Native_IsSequenceFinished);
+
+	CreateNative("CStudioHdr.CStudioHdr", Native_CStudioHdr);
+	CreateNative("CStudioHdr.deleteThis", Native_CStudioHdr_DeleteThis);
 }
 
 // Big thanks to LuqS
@@ -344,13 +357,5 @@ Address GetEntityCStudioHdr(int entity)
 		return Address_Null;
 
 	// Create a new CStudioHdr instance based on the model path.
-	Address pCStudioHdr = SDKCall(g_hSDKCall_ModelSoundCache_LoadModel, sModel);
-		
-	if (!pCStudioHdr)
-		return Address_Null;
-
-	// Delete the CStudioHdr instance to not leak memory.
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pCStudioHdr);
-
-	return pCStudioHdr;
+	return view_as<Address>(SDKCall(g_hSDKCall_ModelSoundCache_LoadModel, sModel));
 }

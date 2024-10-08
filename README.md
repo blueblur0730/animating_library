@@ -72,3 +72,13 @@
 - 10/8/24: v1.4.1
   - Changes:
     1. Fixed parameter missing of SequenceDration call setup.
+
+- 10/8/24: v1.4.2
+  - Natives:
+    1. CStudioHdr.CStudioHdr
+    2. CStudioHdr.deleteThis
+
+  - Changes:
+    1. Fixed an issue related to CStudioHdr call setup.
+    2. Fixed an issue related to SequenceDuration call method.
+    3. Seperated CStudioHdr and CBaseAnimating natives.
