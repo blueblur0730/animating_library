@@ -82,3 +82,7 @@
     1. Fixed an issue related to CStudioHdr call setup.
     2. Fixed an issue related to SequenceDuration call method.
     3. Seperated CStudioHdr and CBaseAnimating natives.
+
+- 10/8/24: v1.4.3
+  - Changes:
+    1. Fixed an issue related to GetSequenceMovement call setup.
