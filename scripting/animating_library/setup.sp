@@ -89,7 +89,19 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper ret25 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_GoToSequence				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GoToSequence", params24, sizeof(params24), true, ret25);
 
+	SDKCallParamsWrapper params25[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret26 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_SelectWeightedSequence	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::SelectWeightedSequence", params25, sizeof(params25), true, ret26);
 
+	SDKCallParamsWrapper params26[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }, {SDKType_PlainOldData, SDKPass_Plain}};
+	SDKCallParamsWrapper ret27 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_LastVisibleCycle			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LastVisibleCycle", params26, sizeof(params26), true, ret27);
+
+	SDKCallParamsWrapper params27[] 	= {{ SDKType_Float, SDKPass_Plain }, {SDKType_Float, SDKPass_Plain}};
+	g_hSDKCall_SetModelScale			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SetModelScale", params27, sizeof(params27), false, _);
+
+	SDKCallParamsWrapper params28[] 	= {{ SDKType_String, SDKPass_Pointer }};
+	g_hSDKCall_SetModel					= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::SetModel", params28, sizeof(params28), false, _);
 
 	switch (gd.OS)
 	{
@@ -164,6 +176,8 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 void CreateNatives()
 {
 	CreateNative("CBaseAnimating.CBaseAnimating", Native_CBaseAnimating);
+	CreateNative("CBaseAnimating.m_nBody.get", Native_GetBodyGroupProperty);
+	CreateNative("CBaseAnimating.m_nBody.set", Native_SetBodyGroupProperty);
 	CreateNative("CBaseAnimating.FindBodyGroupByName", Native_FindBodyGroupByName);
 	CreateNative("CBaseAnimating.SetBodyGroup", Native_SetBodyGroup);
 	CreateNative("CBaseAnimating.GetBodyGroup", Native_GetBodyGroup);
@@ -180,6 +194,10 @@ void CreateNatives()
 
 	CreateNative("CBaseAnimating.m_nSequence.get", Native_GetSequence);
 	CreateNative("CBaseAnimating.m_nSequence.set", Native_SetSequence);
+	CreateNative("CBaseAnimating.m_flCycle.get", Native_GetCycle);
+	CreateNative("CBaseAnimating.m_flCycle.set", Native_SetCycle);
+	CreateNative("CBaseAnimating.m_flPlaybackRate.get", Native_GetPlaybackRate);
+	CreateNative("CBaseAnimating.m_flPlaybackRate.set", Native_SetPlaybackRate);
 	CreateNative("CBaseAnimating.GetSequenceName", Native_GetSequenceName);
 	CreateNative("CBaseAnimating.GetSequenceActivity", Native_GetSequenceActivity);
 	CreateNative("CBaseAnimating.GetSequenceActivityName", Native_GetSequenceActivityName);
@@ -190,6 +208,7 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.GetSequenceMovement", Native_GetSequenceMovement);
 	CreateNative("CBaseAnimating.SequenceDuration", Native_SequenceDuration);
 	CreateNative("CBaseAnimating.GetSequenceCycleRate", Native_GetSequenceCycleRate);
+	CreateNative("CBaseAnimating.LastVisibleCycle", Native_LastVisibleCycle);
 	CreateNative("CBaseAnimating.GetSequenceGroundSpeed", Native_GetSequenceGroundSpeed);
 	CreateNative("CBaseAnimating.LookupSequence", Native_LookupSequence);
 	CreateNative("CBaseAnimating.IsValidSequence", Native_IsValidSequence);
@@ -199,6 +218,11 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.ResetSequenceInfo", Native_ResetSequenceInfo);
 	CreateNative("CBaseAnimating.FindTransitionSequence", Native_FindTransitionSequence);
 	CreateNative("CBaseAnimating.GoToSequence", Native_GoToSequence);
+	CreateNative("CBaseAnimating.SelectWeightedSequence", Native_SelectWeightedSequence);
+
+	CreateNative("CBaseAnimating.m_nModelScale.get", Native_GetModelScale);
+	CreateNative("CBaseAnimating.m_nModelScale.set", Native_SetModelScale);
+	CreateNative("CBaseAnimating.SetModel", Native_SetModel);
 
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 

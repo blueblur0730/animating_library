@@ -4,7 +4,7 @@
 #define _animating_libarary_
 
 /**
- * CBaseAnimating library for l4d2.
+ * Animating library for l4d2.
  * 
  * Every entity that has a model uses CBaseAnimating. Classes derived from CBaseAnimating can set a model and animate.
  * It also enables entities to display a studio model.
@@ -15,13 +15,13 @@
  * Garry's Mod Wiki as reference:
  * https://wiki.facepunch.com/gmod/Entity
  * 
- * For weapons, specifies the world model(w_model) and the view model(v_model) when using the natives.
+ * For weapons, please specifies the world model(w_model) and the view model(v_model), which has a different entity index in the game, when using the natives.
  * 
  * We will use the decriptions from Garry's Mod Wiki as reference.
 */
 
 // sequence flags
-// See here: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/public/studio.h#L2936
+// See here: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L2936
 #define STUDIO_LOOPING	    (1 << 0)		// ending frame should be the same as the starting frame
 #define STUDIO_SNAP		    (1 << 1)		// do not interpolate between previous animation and this one
 #define STUDIO_DELTA	    (1 << 2)		// this sequence "adds" to the base sequences, not slerp blends
@@ -48,7 +48,8 @@ methodmap CBaseAnimating
      * 
      * @param entity    The entity index of the instance. (must have a model)
      * 
-     * @return          A CBaseAnimating pointer address.
+     * @return          A CBaseAnimating pointer address. 
+     *                  It can be used to call any function from this class, and classes inherited from it.
      */
     public native CBaseAnimating(int entity);
 
@@ -59,6 +60,16 @@ methodmap CBaseAnimating
     // https://developer.valvesoftware.com/wiki/$bodygroup
 
     /**
+     * Get/Set the value of m_nBody.
+     * 
+     * @note            This is different from Get/SetBodyGroup(). m_nBody represents the currently active Body Group ID of this entity's model.
+    */
+    property int m_nBody {
+        public native get();
+        public native set(int value);
+    }
+
+    /**
      * Returns the Body Group ID of a speciifc class name.
      * 
      * @param name      The name of the Body Group class.
@@ -67,6 +78,8 @@ methodmap CBaseAnimating
      *                  -1 if dynamic model is loading (m_bDynamicModelPending).
     */
     public native int FindBodyGroupByName(const char[] name);
+
+    // if you are wondering these names well that is what it names.
 
     /**
      * Sets the given Body Group ID to the given value.
@@ -152,7 +165,7 @@ methodmap CBaseAnimating
     /**
      * Find undamaged bodygroup part index
      * 
-     * @note            See from: https://github.com/ReactiveDrop/reactivedrop_public_src/blob/0b3a6dcd74dce45e35ca6c0d823fd19ccc610b91/src/game/server/baseanimating.cpp#L2343
+     * @note            See from: https://github.com/ReactiveDrop/reactivedrop_public_src/tree/reactivedrop_beta/src/game/server/baseanimating.cpp#L2343
      * @note            Used by CBaseAnimating::RandomizeBodygroups, assumming that this is a randomizer for CI Models.
      * 
      * @param iGroup    The Body Group ID to get. Starting from 0.
@@ -166,7 +179,7 @@ methodmap CBaseAnimating
     /**
      * Count total undamaged bodygroup parts
      * 
-     * @note            See from: https://github.com/ReactiveDrop/reactivedrop_public_src/blob/0b3a6dcd74dce45e35ca6c0d823fd19ccc610b91/src/game/server/baseanimating.cpp#L2313
+     * @note            See from: https://github.com/ReactiveDrop/reactivedrop_public_src/tree/reactivedrop_beta/src/game/server/baseanimating.cpp#L2313
      * @note            Used by CBaseAnimating::RandomizeBodygroups, assumming that this is a randomizer for CI Models.
      * 
      * @param iGroup    The Body Group ID to get. Starting from 0.
@@ -228,6 +241,26 @@ methodmap CBaseAnimating
     property int m_nSequence {
         public native get();
         public native set(int sequence);
+    }
+
+    /**
+     * Get/Set the value of m_flCycle.
+     * 
+     * @note            0.0 =< m_flCycle <= 1.0
+    */
+    property float m_flCycle {
+        public native get();
+        public native set(float cycle);
+    }
+
+    /**
+     * Get/Set the value of m_flPlaybackRate.
+     * 
+     * @note            0.0 =< m_flPlaybackRate, set to 0.0 will stop the animation. 1.0 is the normal speed.
+    */
+    property float m_flPlaybackRate {
+        public native get();
+        public native set(float rate);
     }
 
     /**
@@ -349,6 +382,18 @@ methodmap CBaseAnimating
     public native float GetSequenceCycleRate(int sequence);
 
     /**
+     * Returns the last visible cycle of the sequence.
+     * 
+     * @note            returns pSeqdesc(iSequence).fadeouttime * GetSequenceCycleRate(iSequence) * m_flPlaybackRate.
+     * 
+     * @param sequence  The index of the sequence to get the last visible cycle of.
+     * 
+     * @return          The last visible cycle of the sequence.
+     *                  1.0 if the entity has no model, or the sequence has looping flag.
+    */
+    public native float LastVisibleCycle(int sequence);
+
+    /**
      * Returns the ground speed of the entity's sequence.
      * 
      * @note            m_flGroundSpeed = GetSequenceGroundSpeed() * m_flModelScale
@@ -397,7 +442,7 @@ methodmap CBaseAnimating
      * Checks if a sequence has looping flag or not. (m_bSequenceLoops)
      * 
      * @note            Uses SDKCall. or you can use GetEntProp youself.
-     * @note            See 'struct mstudioseqdesc_t' (sequence descriptions) here: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/public/studio.h#L779
+     * @note            See 'struct mstudioseqdesc_t' (sequence descriptions) here: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L779
      * 
      * @param sequence  The index of the sequence to check.
      * 
@@ -422,7 +467,7 @@ methodmap CBaseAnimating
     /**
      * Reset entity sequence info such as playback rate, ground speed, last event check, etc.
      * 
-     * @note            See: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/game/server/baseanimating.cpp#L883
+     * @note            See: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/server/baseanimating.cpp#L883
      * 
      * @noreturn
     */
@@ -432,8 +477,8 @@ methodmap CBaseAnimating
      * Returns a transition from the given start and end sequence.
      * 
      * @note                    From Garry's Mod Wiki: "This function was only used by HL1 entities and NPCs, before the advent of sequence blending and gestures."
-     * @note                    https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/game/server/baseanimating.cpp#L2092
-     * @note                    https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/shared/animation.cpp#L616
+     * @note                    https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/server/baseanimating.cpp#L2092
+     * @note                    https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/shared/animation.cpp#L616
      * 
      * @param iCurrentSequence  The index of The currently playing sequence
      * @param iGoalSequence     The index of the goal sequence.
@@ -445,7 +490,7 @@ methodmap CBaseAnimating
     /**
      * No description found for now. In L4D2 this is called by CDynamicProp::PropSetSequence.
      * 
-     * @note                    See: https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/shared/animation.cpp#L701
+     * @note                    See: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/shared/animation.cpp#L701
      * 
      * @param iCurrentSequence  The index of The currently playing sequence (m_nSequence)
      * @param flCurrentCycle    The current cycle of the sequence.  (m_flCycle)
@@ -457,8 +502,57 @@ methodmap CBaseAnimating
      * 
      * @return                  True if the operation was successful, false otherwise.
     */
-    public native bool GoToSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir)
+    public native bool GoToSequence(int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir);
+
+    /**
+     * Returns sequence ID corresponding to given activity ID.
+     * 
+     * @note            For activity ID, see left4dhooks_anim.inc.
+     * @note            Opposite of GetSequenceActivity.
+     * 
+     * @param iActivity The activity ID to get the sequence of.
+     * 
+     * @return          The sequence ID corresponding to given activity ID.
+    */
+    public native int SelectWeightedSequence(int iActivity);
+
+    /*<-------------->*/
+    /* Model Related */
+
+    /**
+     * Get/Set the value of m_nModelScale.
+     * 
+     * @note            set() uses SDKCall function. (CBaseAnimating::SetModelScale), some info about this function is below:
+     * @note            From Garry's Mod Wiki: "If the entity is a Player or an NPC the hitboxes will be scaled as well."
+     * @note            From Garry's Mod Wiki: "For some entities, calling (in c++) CBaseAnimating::Activate after this will scale the collision bounds and PhysObj as well; be wary as there's no optimization being done internally and highly complex collision models might crash the server."
+     * @note            From Garry's Mod Wiki: "Client-side trace detection seems to mess up if change_duration is set to anything but zero."
+    */
+    property float m_nModelScale {
+        public native get();
+        public native set(float scale /*float change_duration = 0.0f*/);
+    }
+
+    /**
+     * Set this entity's model.
+     * 
+     * @note            Same as sourcemod native SetEntityModel().
+     * @note            Once called, it will delete the CStudioHdr instance of the model of this entity.
+     * @note            From Garry's Mod Wiki: "This does not update the physics of the entity."
+     * @note            From Garry's Mod Wiki: "This silently fails when given an empty string. (or a string pointed to a none existed model.)"
+     * 
+     * @param szModelName The name of the model to set. Be sure it is corrent and not empty.
+     * 
+     * @noreturn
+    */
+    public native void SetModel(const char[] szModelName);
+
+    /*<-------------->*/
+    /* Bone Related */
+
+
 }
+
+// Listed this native alone because it has no class.
 
 /**
  * Returns the flags number of the given sequence.
@@ -515,6 +609,8 @@ public SharedPlugin __pl_animating_library =
 public void __pl_animating_library_SetNTVOptional()
 {
     MarkNativeAsOptional("CBaseAnimating.CBaseAnimating");
+    MarkNativeAsOptional("CBaseAnimating.m_nBody.get");
+    MarkNativeAsOptional("CBaseAnimating.m_nBody.set");
     MarkNativeAsOptional("CBaseAnimating.FindBodyGroupByName");
     MarkNativeAsOptional("CBaseAnimating.SetBodyGroup");
     MarkNativeAsOptional("CBaseAnimating.GetBodyGroup");
@@ -531,6 +627,10 @@ public void __pl_animating_library_SetNTVOptional()
 
     MarkNativeAsOptional("CBaseAnimating.m_nSequence.get");
     MarkNativeAsOptional("CBaseAnimating.m_nSequence.set");
+    MarkNativeAsOptional("CBaseAnimating.m_flCycle.get");
+    MarkNativeAsOptional("CBaseAnimating.m_flCycle.set");
+    MarkNativeAsOptional("CBaseAnimating.m_flPlaybackRate.get");
+    MarkNativeAsOptional("CBaseAnimating.m_flPlaybackRate.set");
     MarkNativeAsOptional("CBaseAnimating.GetSequenceName");
     MarkNativeAsOptional("CBaseAnimating.GetSequenceActivity");
     MarkNativeAsOptional("CBaseAnimating.GetSequenceActivityName");
@@ -541,6 +641,7 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.GetSequenceMovement");
     MarkNativeAsOptional("CBaseAnimating.SequenceDuration");
     MarkNativeAsOptional("CBaseAnimating.GetSequenceCycleRate");
+    MarkNativeAsOptional("CBaseAnimating.LastVisibleCycle");
     MarkNativeAsOptional("CBaseAnimating.GetSequenceGroundSpeed");
     MarkNativeAsOptional("CBaseAnimating.LookupSequence");
     MarkNativeAsOptional("CBaseAnimating.IsValidSequence");
@@ -550,6 +651,11 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.ResetSequenceInfo");
     MarkNativeAsOptional("CBaseAnimating.FindTransitionSequence");
     MarkNativeAsOptional("CBaseAnimating.GoToSequence");
+    MarkNativeAsOptional("CBaseAnimating.SelectWeightedSequence");
+
+    MarkNativeAsOptional("CBaseAnimating.m_flModelScale.get");
+    MarkNativeAsOptional("CBaseAnimating.m_flModelScale.set");
+    MarkNativeAsOptional("CBaseAnimating.SetModel");
 
     MarkNativeAsOptional("GetSequenceFlags");
 

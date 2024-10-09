@@ -125,6 +125,18 @@
                 "linux"     "210"
                 "windows"   "209"
             }
+
+            "CBaseAnimating::SelectWeightedSequence"
+            {
+                "linux"     "208"
+                "windows"   "207"
+            }
+
+            "CBaseAnimating::SetModel"
+            {
+                "linux"     "28"
+                "windows"   "27"
+            }
         }
 
         "Signatures"
@@ -374,6 +386,16 @@
             }
 
             // windows sig:
+            // search for string "CBaseAnimating::LastVisibleCycle( %d ) NULL pstudiohdr on %s!\n"
+            "CBaseAnimating::LastVisibleCycle"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating19GetLastVisibleCycleEP10CStudioHdri"
+                "windows"   "\x55\x8B\xEC\x53\x8B\x5D\x08\x56\x8B\xF1\x85\xDB\x75\x2A\x8B\x76\x74"
+                /* 55 8B EC 53 8B 5D 08 56 8B F1 85 DB 75 ? 8B 76 74 */
+            }
+
+            // windows sig:
             // search for string "CBaseAnimating::SequenceDuration( %d ) NULL pstudiohdr on %s!\n" or "CBaseAnimating::SequenceDuration( %d ) out of range\n"
             "CBaseAnimating::SequenceDuration"
             {
@@ -456,6 +478,19 @@
                 "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x20"
                 /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 20 */
             }
+
+            // windows sig:
+            // find CTerrorPlayer::OnRideEnded by string "jockey_ride_end"
+            // down the buttom of the function the call that passes (1.0, 0.0) is it.
+            "CBaseAnimating::SetModelScale"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating13SetModelScaleEff"
+                "windows"   "\x55\x8B\xEC\xF3\x0F\x10\x45\x0C\x0F\x2F\x05\x2A\x2A\x2A\x2A"
+                /* 55 8B EC F3 0F 10 45 0C 0F 2F 05 ? ? ? ? */
+            }
+
+            
         }
     }
 }

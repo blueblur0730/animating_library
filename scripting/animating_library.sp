@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.5"
+#define PLUGIN_VERSION "1.6"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
@@ -39,12 +39,17 @@ Handle
 	g_hSDKCall_GetSequenceMoveYaw		= null,
 	g_hSDKCall_GetSequenceMovement		= null,
 	g_hSDKCall_SequenceDuration			= null,
+	g_hSDKCall_LastVisibleCycle			= null,
 	g_hSDKCall_LookupSequence			= null,
 	g_hSDKCall_IsValidSequence			= null,
 	g_hSDKCall_ResetSequence			= null,
 	g_hSDKCall_ResetSequenceInfo		= null,
 	g_hSDKCall_FindTransitionSequence	= null,
-	g_hSDKCall_GoToSequence				= null;
+	g_hSDKCall_GoToSequence				= null,
+	g_hSDKCall_SelectWeightedSequence	= null,
+
+	g_hSDKCall_SetModelScale			= null,
+	g_hSDKCall_SetModel					= null;
 
 #include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"

@@ -21,6 +21,28 @@ any Native_CBaseAnimating(Handle plugin, int numParams)
 	return view_as<Address>(SDKCall(g_hSDKCall_GetBaseAnimating, entity));
 }
 
+int Native_GetBodyGroupProperty(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	return GetEntProp(entity, Prop_Send, "m_nBody");
+}
+
+int Native_SetBodyGroupProperty(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+	
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	int value = GetNativeCell(2);
+
+	SetEntProp(entity, Prop_Send, "m_nBody", value);
+
+	return 0;
+}
+
 int Native_FindBodyGroupByName(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(GetNativeCell(1)))
@@ -208,6 +230,48 @@ int Native_SetSequence(Handle plugin, int numParams)
 	return 0;
 }
 
+any Native_GetCycle(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	return GetEntPropFloat(entity, Prop_Send, "m_flCycle");
+}
+
+int Native_SetCycle(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	float flCycle = GetNativeCell(2);
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	SetEntPropFloat(entity, Prop_Send, "m_flCycle", flCycle);
+
+	return 0;
+}
+
+any Native_GetPlaybackRate(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	return GetEntPropFloat(entity, Prop_Send, "m_flPlaybackRate");
+}
+
+int Native_SetPlaybackRate(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	float flPlaybackRate = GetNativeCell(2);
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	SetEntPropFloat(entity, Prop_Send, "m_flPlaybackRate", flPlaybackRate);
+
+	return 0;
+}
+
 int Native_GetSequenceName(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(GetNativeCell(1)))
@@ -351,6 +415,21 @@ any Native_GetSequenceCycleRate(Handle plugin, int numParams)
 	return 10.0;	// 1.0f / 0.1f;
 }
 
+any Native_LastVisibleCycle(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int		iSequence  = GetNativeCell(2);
+	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
+
+	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	float flCycle = SDKCall(g_hSDKCall_LastVisibleCycle, GetNativeCell(1), pStudioHdr, iSequence);
+	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
+
+	return flCycle;
+}
+
 any Native_GetSequenceGroundSpeed(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(GetNativeCell(1)))
@@ -484,4 +563,50 @@ any Native_GoToSequence(Handle plugin, int numParams)
 	SetNativeCellRef(8, iNextDir);
 
 	return bFound;
+}
+
+int Native_SelectWeightedSequence(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iActivity = GetNativeCell(2);
+
+	return SDKCall(g_hSDKCall_SelectWeightedSequence, GetNativeCell(1), iActivity);
+}
+
+any Native_GetModelScale(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int entity = EntRefToEntIndex(GetNativeCell(1));
+	return GetEntPropFloat(entity, Prop_Send, "m_flModelScale");
+}
+
+int Native_SetModelScale(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	float scale = GetNativeCell(2);
+	SDKCall(g_hSDKCall_SetModelScale, GetNativeCell(1), scale, 0.0);
+
+	return 0;
+}
+
+int Native_SetModel(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int maxlength;
+	GetNativeStringLength(2, maxlength);
+	maxlength += 1;
+	char[] name = new char[maxlength];
+	GetNativeString(2, name, maxlength + 1);
+
+	SDKCall(g_hSDKCall_SetModel, GetNativeCell(1), name);
+
+	return 0;
 }
