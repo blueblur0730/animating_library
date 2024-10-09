@@ -101,3 +101,20 @@
     4. CBaseAnimating.FindTransitionSequence
     5. CBaseAnimating.GoToSequence
     6. GetSequenceFlags
+
+- 10/10/24: v1.6
+  - Natives:
+    1. CBaseAnimating.m_nBody.get
+    2. CBaseAnimating.m_nBody.set
+    3. CBaseAnimating.m_flCycle.get
+    4. CBaseAnimating.m_flCycle.set
+    5. CBaseAnimating.m_flPlaybackRate.get
+    6. CBaseAnimating.m_flPlaybackRate.set
+    7. CBaseAnimating.LastVisibleCycle
+    8. CBaseAnimating.SelectWeightedSequence
+    9. CBaseAnimating.m_flModelScale.get
+    10. CBaseAnimating.m_flModelScale.set
+    11. CBaseAnimating.SetModel
+  
+  - Changes:
+    1. Modified links in the documentations.
