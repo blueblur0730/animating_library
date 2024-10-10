@@ -135,3 +135,4 @@
     1. Changed some natives of CBaseAnimating that need to pass a CStudioHdr pointer to retrieve an existed one via CBaseAnimating.GetModelPtr instead of creating one.
     2. String length change in CBaseAnimating.LookupSequence.
     3. Changed native name CBaseAnimating.BodyGroupNum.get -> CBaseAnimating.GetBodyGroupNum.
+    4. Documentations stuff.
