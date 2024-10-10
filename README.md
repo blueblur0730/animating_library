@@ -9,6 +9,11 @@
 - These natives are NOT TESTED. Use at your own risk. I'd be appreciated if you could report any issues or bugs, or help fix them.
 - May not work in windows server since the signatures are unstable or not found.
 
+### Credits To
+
+- Forgetest, for his original idea of gamedata methodmap wrapper for setting up, which increases the overall readability of the code.
+- LuqS, for his findings on CStudioHdr stuff.
+
 ### Requiements
 
 - None.
@@ -118,3 +123,15 @@
   
   - Changes:
     1. Modified links in the documentations.
+
+- 10/11/24: v1.6.1
+  - Natives:
+    1. CBaseAnimating.GetModelPtr
+    2. CBaseAnimating.LookupBone
+    3. CBaseAnimating.GetNumBones
+    4. CBaseAnimating.GetBonePosition
+
+  - Changes:
+    1. Changed some natives of CBaseAnimating that need to pass a CStudioHdr pointer to retrieve an existed one via CBaseAnimating.GetModelPtr instead of creating one.
+    2. String length change in CBaseAnimating.LookupSequence.
+    3. Changed native name CBaseAnimating.BodyGroupNum.get -> CBaseAnimating.GetBodyGroupNum.

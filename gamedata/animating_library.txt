@@ -12,10 +12,10 @@
 		}
 	}
 
-    //-------------------------------------------------------------
-    // feel free to use any of these signatures if you need one. 
+    //-----------------------------------------------------------------------
+    // feel free to use any of these signatures and offsets if you need one. 
     // all found by blueblur.
-    //-------------------------------------------------------------
+    //-----------------------------------------------------------------------
 
     "left4dead2"
     {
@@ -104,10 +104,42 @@
                     "offset"    "0xF"   // sub_10196990+F    E8 9C AE E9 FF                    call    sub_10031840
                 }
             }
+
+            "CBaseAnimating::LookupBone"
+            {
+                "linux"
+                {
+                    "signature" "CBaseAnimating::LookupBone"
+                }
+                "windows"
+                {
+                    "signature" "CTankClaw::DoSwing"
+                    "offset"    "0x6D" // sub_103E6D90+6D   E8 2E B1 C4 FF                    call    sub_10031F30
+                }
+            }
         }
 
         "Offsets"
         {
+            "CBaseAnimating->m_pStudioHdr"
+            {
+                "linux"     "5088"  // 0x13E0
+                "windows"   "5072"  // 0x13D0
+            }
+
+            // Big Thanks to LuqS, it turns out this offset applied to csgo and l4d2 as well.
+            // pStudioHdr->numbones() is called by many functions. grab any of them, find the pointer to it,
+            // see what var could possibly be relative to bone numbers returned by the pointer + offset.
+            "studiohdr_t->numbones"
+            {
+                "windows"	"156"
+                "linux"	    "156"
+            }
+
+            //--------------------------
+            // Virtual function offsets
+            //--------------------------
+
             "CBaseAnimating::GetBaseAnimating"
             {
                 "linux"     "60"
@@ -164,6 +196,14 @@
                 "library"   "server"
                 "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x8B\xF1\x85\xFF\x74\x2A\x57\xE8\x2A\x2A\x2A\x2A\x8B\xCE"
                 /* 55 8B EC 56 57 8B 7D 08 8B F1 85 FF 74 ? 57 E8 ? ? ? ? 8B CE */
+            }
+
+            // search for string "ValveBiped.Bip01_L_Hand" to find CTankClaw::DoSwing
+            "CTankClaw::DoSwing"
+            {
+                "library"   "server"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x20\x56\x89\x4D\xF8"
+                /* 55 8B EC 83 EC 20 56 89 4D F8 */
             }
 
             // windows sig:
@@ -490,7 +530,23 @@
                 /* 55 8B EC F3 0F 10 45 0C 0F 2F 05 ? ? ? ? */
             }
 
-            
+            "CBaseAnimating::LookupBone"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating10LookupBoneEPKc"
+            }
+
+            // windows sig:
+            // find CTankClaw::DoSwing like above.
+            // down the buttom of the function, inside of the 'if' statement "if ( result < 0 )"
+            // the call that passes 4 params is it.
+            "CBaseAnimating::GetBonePosition"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating15GetBonePositionEiR6VectorR6QAngle"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x34\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x53\x8B\x5D\x10"
+                /* 55 8B EC 83 EC 34 A1 ? ? ? ? 33 C5 89 45 FC 53 8B 5D 10 */
+            }
         }
     }
 }

@@ -3,9 +3,8 @@
 #endif
 #define _animating_libarary_setup_
 
-void CreateSDKCalls()
+void CreateSDKCalls(GameDataWrapper	gd)
 {
-	GameDataWrapper	gd = new GameDataWrapper(GAMEDATA_FILE);
 	CreateCStuidoHdrSDKCalls(gd);
 
 	// weird sourcemod shit
@@ -103,6 +102,9 @@ void CreateSDKCalls()
 	SDKCallParamsWrapper params28[] 	= {{ SDKType_String, SDKPass_Pointer }};
 	g_hSDKCall_SetModel					= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::SetModel", params28, sizeof(params28), false, _);
 
+	SDKCallParamsWrapper params30[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_QAngle, SDKPass_ByRef }};
+	g_hSDKCall_GetBonePosition			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBonePosition", params30, sizeof(params30), false, _);
+
 	switch (gd.OS)
 	{
 		case OS_Windows:
@@ -130,6 +132,10 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params19[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret20 			= { SDKType_Float, SDKPass_Plain };
 			g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::LookupSequence", params19, sizeof(params19), true, ret20);
+
+			SDKCallParamsWrapper params29[] 	= {{ SDKType_String, SDKPass_Pointer }};
+			SDKCallParamsWrapper ret30 			= { SDKType_PlainOldData, SDKPass_Plain };
+			g_hSDKCall_LookupBone 				= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::LookupBone", params29, sizeof(params29), true, ret30);
 		}
 
 		case OS_Linux:
@@ -157,10 +163,12 @@ void CreateSDKCalls()
 			SDKCallParamsWrapper params19[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret20 			= { SDKType_Float, SDKPass_Plain };
 			g_hSDKCall_SequenceDuration			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupSequence", params19, sizeof(params19), true, ret20);
+
+			SDKCallParamsWrapper params29[] 	= {{ SDKType_String, SDKPass_Pointer }};
+			SDKCallParamsWrapper ret30 			= { SDKType_PlainOldData, SDKPass_Plain };
+			g_hSDKCall_LookupBone 				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupBone", params29, sizeof(params29), true, ret30);
 		}
 	}
-
-	delete gd;
 }
 
 void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
@@ -171,6 +179,12 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 
 	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Pointer }};
 	g_hSDKCall_ModelSoundCache_FinishModel = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
+}
+
+void RetrieveOffsets(GameDataWrapper gd)
+{
+	g_iOffset_pStudioHdr = gd.GetOffset("CBaseAnimating->m_pStudioHdr");
+	g_iOffset_numbones	 = gd.GetOffset("studiohdr_t->numbones");
 }
 
 void CreateNatives()
@@ -184,7 +198,7 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.GetBodyGroupCount", Native_GetBodyGroupCount);
 	CreateNative("CBaseAnimating.GetBodyGroupName", Native_GetBodyGroupName);
 	CreateNative("CBaseAnimating.GetBodyGroupPartName", Native_GetBodyGroupPartName);
-	CreateNative("CBaseAnimating.BodyGroupNum.get", Native_GetNumBodyGroups);
+	CreateNative("CBaseAnimating.GetBodyGroupNum", Native_GetNumBodyGroups);
 	CreateNative("CBaseAnimating.FindBodyGroupVariant", Native_FindBodyGroupVariant);
 	CreateNative("CBaseAnimating.CountBodyGroupVarirant", Native_CountBodyGroupVarirant);
 
@@ -223,6 +237,11 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.m_nModelScale.get", Native_GetModelScale);
 	CreateNative("CBaseAnimating.m_nModelScale.set", Native_SetModelScale);
 	CreateNative("CBaseAnimating.SetModel", Native_SetModel);
+	CreateNative("CBaseAnimating.GetModelPtr", Native_GetModelPtr);
+
+	CreateNative("CBaseAnimating.LookupBone", Native_LookupBone);
+	CreateNative("CBaseAnimating.GetNumBones", Native_GetNumBones);
+	CreateNative("CBaseAnimating.GetBonePosition", Native_GetBonePosition);
 
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 

@@ -20,9 +20,10 @@ int Native_GetSequenceFlags(Handle plugin, int numParams)
 		return 0;
 	}
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	int Ref = EntIndexToEntRef(entity);
+
+	Address pStudioHdr = GetModelPtr(view_as<Address>(Ref));
 	int		flags	   = SDKCall(g_hSDKCall_GetSequenceFlags, pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	return flags;
 }

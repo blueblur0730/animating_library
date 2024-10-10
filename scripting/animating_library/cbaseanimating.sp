@@ -389,11 +389,10 @@ any Native_SequenceDuration(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
 	int		iSequence  = GetNativeCell(2);
-	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
 	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
+
 	return flDuration;
 }
 
@@ -403,11 +402,9 @@ any Native_GetSequenceCycleRate(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
 	int		iSequence  = GetNativeCell(2);
-	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
 	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	if (flDuration > 0.0)
 		return 1.0 / flDuration;
@@ -421,11 +418,9 @@ any Native_LastVisibleCycle(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
 	int		iSequence  = GetNativeCell(2);
-	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
 	float flCycle = SDKCall(g_hSDKCall_LastVisibleCycle, GetNativeCell(1), pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	return flCycle;
 }
@@ -436,11 +431,9 @@ any Native_GetSequenceGroundSpeed(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
 	int		iSequence  = GetNativeCell(2);
-	int		entity	   = EntRefToEntIndex(GetNativeCell(1));
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
 	float	flDuration = SDKCall(g_hSDKCall_SequenceDuration, GetNativeCell(1), pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	float vec[3];
 	SDKCall(g_hSDKCall_GetSequenceLinearMotion, GetNativeCell(1), iSequence, vec);
@@ -461,7 +454,7 @@ int Native_LookupSequence(Handle plugin, int numParams)
 	GetNativeStringLength(2, maxlength);
 	maxlength += 1;
 	char[] name = new char[maxlength];
-	GetNativeString(2, name, maxlength + 1);
+	GetNativeString(2, name, maxlength);
 
 	return SDKCall(g_hSDKCall_LookupSequence, GetNativeCell(1), name);
 }
@@ -504,9 +497,8 @@ any Native_IsSequenceLooping(Handle plugin, int numParams)
 		return 0;
 	}
 
-	Address pStudioHdr = GetEntityCStudioHdr(entity);
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
 	int		flags	   = SDKCall(g_hSDKCall_GetSequenceFlags, pStudioHdr, iSequence);
-	SDKCall(g_hSDKCall_ModelSoundCache_FinishModel, pStudioHdr);
 
 	return (flags & 1) != 0;	// STUDIO_LOOPING
 }
@@ -607,6 +599,60 @@ int Native_SetModel(Handle plugin, int numParams)
 	GetNativeString(2, name, maxlength + 1);
 
 	SDKCall(g_hSDKCall_SetModel, GetNativeCell(1), name);
+
+	return 0;
+}
+
+any Native_GetModelPtr(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	return GetModelPtr(view_as<Address>(GetNativeCell(1)));
+}
+
+int Native_LookupBone(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int maxlength;
+	GetNativeStringLength(2, maxlength);
+	maxlength += 1;
+	char[] name = new char[maxlength];
+	GetNativeString(2, name, maxlength);
+
+	return SDKCall(g_hSDKCall_LookupBone, GetNativeCell(1), name);
+}
+
+// you can call CBaseAnimating::GetNumBones, but you may only find linux signature since there's no function calls this function,
+// and it's not a virtual function so you know it windows is dead. (or you can try youself to find it)
+// so we just load this value from studiohdr_t->numbones.
+// https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L2383
+// https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L2087
+int Native_GetNumBones(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	// CBaseAnimating -> m_pStudioHdr -> numbones.
+	Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
+	return view_as<int>(LoadFromAddress(pStudioHdr + view_as<Address>(g_iOffset_numbones) ,NumberType_Int32));
+}
+
+any Native_GetBonePosition(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iBone = GetNativeCell(2);
+	float vec[3]; float ang[3];
+	GetNativeArray(3, vec, sizeof(vec));
+	GetNativeArray(4, ang, sizeof(ang));
+
+	SDKCall(g_hSDKCall_GetBonePosition, GetNativeCell(1), iBone, vec, ang);
+	SetNativeArray(3, vec, sizeof(vec));
+	SetNativeArray(4, ang, sizeof(ang));
 
 	return 0;
 }

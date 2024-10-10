@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.6"
+#define PLUGIN_VERSION "1.6.1"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
@@ -49,7 +49,14 @@ Handle
 	g_hSDKCall_SelectWeightedSequence	= null,
 
 	g_hSDKCall_SetModelScale			= null,
-	g_hSDKCall_SetModel					= null;
+	g_hSDKCall_SetModel					= null,
+
+	g_hSDKCall_LookupBone				= null,
+	g_hSDKCall_GetBonePosition			= null;
+
+int 
+	g_iOffset_pStudioHdr = -1,
+	g_iOffset_numbones	 = -1;
 
 #include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"
@@ -85,7 +92,12 @@ public void OnPluginStart()
 {
 	CreateConVar("animating_library_version", PLUGIN_VERSION, "Animating Library version.", FCVAR_NOTIFY | FCVAR_DONTRECORD);
 
-	CreateSDKCalls();
+	GameDataWrapper	gd = new GameDataWrapper(GAMEDATA_FILE);
+
+	CreateSDKCalls(gd);
+	RetrieveOffsets(gd);
+
+	delete gd;
 }
 
 bool ValidateAddress(Address pAdr)
@@ -98,4 +110,28 @@ bool HasModel(int entity)
 	char buffer[PLATFORM_MAX_PATH];
 	GetEntPropString(entity, Prop_Data, "m_ModelName", buffer, sizeof(buffer));
 	return buffer[0] != '\0' ? true : false;
+}
+
+// this function loads an existed CStudioHdr instance of an entity's model.
+Address GetModelPtr(Address pBaseAnimating)
+{
+	return LoadFromAddress(pBaseAnimating + view_as<Address>(g_iOffset_pStudioHdr), NumberType_Int32);
+}
+
+// Big thanks to LuqS
+// https://forums.alliedmods.net/showthread.php?t=333857
+// note: this function uses operator new to CREATE a new CStudioHdr instance.
+Address CreateCStudioHdrOfEntity(int entity)
+{
+	if (!IsValidEntity(entity))
+		return Address_Null;
+
+	char sModel[PLATFORM_MAX_PATH];
+	GetEntPropString(entity, Prop_Data, "m_ModelName", sModel, sizeof(sModel));
+
+	if (!sModel[0])
+		return Address_Null;
+
+	// Create a new CStudioHdr instance based on the model path.
+	return view_as<Address>(SDKCall(g_hSDKCall_ModelSoundCache_LoadModel, sModel));
 }

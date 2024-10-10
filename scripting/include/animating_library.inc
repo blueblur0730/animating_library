@@ -17,7 +17,7 @@
  * 
  * For weapons, please specifies the world model(w_model) and the view model(v_model), which has a different entity index in the game, when using the natives.
  * 
- * We will use the decriptions from Garry's Mod Wiki as reference.
+ * We will use some decriptions from Garry's Mod Wiki as reference.
 */
 
 // sequence flags
@@ -144,24 +144,23 @@ methodmap CBaseAnimating
      * @return          The number of Body Groups in the entity's model.
      *                  0 if dynamic model is loading (m_bDynamicModelPending).
     */
-    property int BodyGroupNum {
-        public native get();
-    }
+    public native int GetBodyGroupNum();
 
-/*
-    Take a example: "infected/common_test.mdl".
+    /*
+        Take a example: "infected/common_test.mdl".
 
-    $bodygroup "Head"
-    {
-	    studio "H01_Head_male_01.smd"
-	    studio "H01_Head_male_02.smd"
-	    studio "H01_Head_male_03.smd"
-	    studio "H01_Head_male_suit_01.smd"
-	    studio "D1_H01_Head_male_02.smd"
-    }
+        $bodygroup "Head"
+        {
+	        studio "H01_Head_male_01.smd"
+	        studio "H01_Head_male_02.smd"
+	        studio "H01_Head_male_03.smd"
+	        studio "H01_Head_male_suit_01.smd"
+	        studio "D1_H01_Head_male_02.smd"
+        }
 
-    the function will return the part index excpet the one with "D" started in the name. (which refered as 'damaged')
-*/
+        the function will return the part index excpet the one with "D" started in the name. (which refered as 'damaged')
+    */
+
     /**
      * Find undamaged bodygroup part index
      * 
@@ -536,7 +535,7 @@ methodmap CBaseAnimating
      * Set this entity's model.
      * 
      * @note            Same as sourcemod native SetEntityModel().
-     * @note            Once called, it will delete the CStudioHdr instance of the model of this entity.
+     * @note            Once called, it will delete the original CStudioHdr instance of the model of this entity.
      * @note            From Garry's Mod Wiki: "This does not update the physics of the entity."
      * @note            From Garry's Mod Wiki: "This silently fails when given an empty string. (or a string pointed to a none existed model.)"
      * 
@@ -546,10 +545,42 @@ methodmap CBaseAnimating
     */
     public native void SetModel(const char[] szModelName);
 
+    /**
+     * Retrieves the internal CStudioHdr pointer address of the entity's model through *m_pStudioHdr.
+     * 
+     * @return          The address of the pointer.
+    */
+    public native CStudioHdr GetModelPtr();
+
     /*<-------------->*/
     /* Bone Related */
 
+    /**
+     * Returns index number of a given named bone
+     * 
+     * @param szName    The name of the bone to get the index of.
+     * 
+     * @return          The index number of the given named bone.
+     *                  -1 if the bone is not found.
+    */
+    public native int LookupBone(const char[] szName);
 
+    /**
+     * Returns the number of bones in the model.
+     * 
+     * @return          The number of bones in the model.
+    */
+    public native int GetNumBones();
+
+    /**
+     * Returns the position and angle of the given bone index, relative to the world.
+     * 
+     * @note            A lot notice from Garry's Mod Wiki. See here: https://wiki.facepunch.com/gmod/Entity:GetBonePosition
+     * @note            Returns nothing if the entity has no model, or the bone index is invalid. (x > max bone number || x < 0)
+     * 
+     * @noreturn
+    */
+    public native void GetBonePosition(int iBone, float vBoneOrigin[3], float vBoneAngles[3]);
 }
 
 // Listed this native alone because it has no class.
@@ -573,7 +604,7 @@ methodmap CStudioHdr
     /* CStudioHdr Constructor */
 
     /**
-     * Creates a new CStudioHdr instance based on the model path.
+     * Creates a new CStudioHdr instance based on the model path via operator new.
      * 
      * @note            Calls operator new to allocate memory for the instance. Must be freed using deleteThis().
      * 
@@ -587,7 +618,8 @@ methodmap CStudioHdr
     /**
      * Frees the memory allocated for the CStudioHdr instance created for an entity.
      * 
-     * @note            Even if the game itself will check if the pointer is null or not, it's still a good practice to free the memory manully.
+     * @note            The game itself will check if the pointer is null or not.
+     * @note            Recommend not to delete an existed and being used instance in case of the error.
      * 
      * @noreturn
     */
@@ -656,6 +688,11 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.m_flModelScale.get");
     MarkNativeAsOptional("CBaseAnimating.m_flModelScale.set");
     MarkNativeAsOptional("CBaseAnimating.SetModel");
+    MarkNativeAsOptional("CBaseAnimating.GetModelPtr");
+
+    MarkNativeAsOptional("CBaseAnimating.LookupBone");
+    MarkNativeAsOptional("CBaseAnimating.GetNumBones");
+    MarkNativeAsOptional("CBaseAnimating.GetBonePosition");
 
     MarkNativeAsOptional("GetSequenceFlags");
 
