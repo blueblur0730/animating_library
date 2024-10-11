@@ -547,6 +547,89 @@
                 "windows"   "\x55\x8B\xEC\x83\xEC\x34\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x53\x8B\x5D\x10"
                 /* 55 8B EC 83 EC 34 A1 ? ? ? ? 33 C5 89 45 FC 53 8B 5D 10 */
             }
+
+            // windows sig:
+            // search for string "Bogus constraint %s (attaches %s to ENTITY NOT FOUND:%s)\n" to find CPhysConstraint::GetConstraintObjects
+            // inside of it the first call is FindPhysicsAnchor, click into it.
+            // notice this 'if' statement "if ( v12 < (int)v21 )", the second call above is CBaseAnimating::GetAttachmentBone.
+            "CBaseAnimating::GetAttachmentBone"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating17GetAttachmentBoneEi"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x57\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\xB6\xD0\x13\x00\x00\x85\xF6\x74\x2A\x83\x3E\x00\x74\x2A\x8B\x7D\x08\x83\xFF\x01"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 57 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B B6 D0 13 00 00 85 F6 74 ? 83 3E 00 74 ? 8B 7D 08 83 FF 01 */
+            }
+
+            // windows sig:
+            // search for string "Data manager 'used' memory incorrect\n" to find CDataManagerBase::GetForFreeByIndex
+            // go xref it, the second call should be CDataManagerBase::EnsureCapacity
+            // go xref it, the only call should be Studio_CreateBoneCache
+            // go xref it, the only call should be CBaseAnimating::GetBoneCache
+            "CBaseAnimaitng::GetBoneCache"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating12GetBoneCacheEv"
+                "windows"   "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\xB8\x28\x18\x00\x00"
+                /* 53 8B DC 83 EC 08 83 E4 F0 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC B8 28 18 00 00 */
+            }
+
+            // windows sig:
+            // follow the guide of CBaseAnimating::GetAttachmentBone, you will see CBaseAnimating::GetPhysicsBone is lying under the CBaseAnimating::GetAttachmentBone.
+            "CBaseAnimating::GetPhysicsBone"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating14GetPhysicsBoneEi"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x8E\xD0\x13\x00\x00\x5E"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 8E D0 13 00 00 5E */
+            }
+
+            // windows sig:
+            // search for string "prop_ragdoll" to find all occurances, the 6th call should be CreateServerRagdoll
+            // (a big function with only "prop_ragdoll" single string involved)
+            // down the buttom of the function, notice the 'if' statement "if ( v39 > 0 )" with a caculation stuff "v78 = 1.0 / v42;" above,
+            // inside of this 'if' statement, the first call in this loop is CBaseAnimating::GetHitboxBone.
+            "CBaseAnimating::GetHitboxBone"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating13GetHitboxBoneEi"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x85\xC0\x74\x2A\x83\x38\x00\x74\x2A\x8B\x08"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 85 C0 74 ? 83 38 00 74 ? 8B 08 */
+            }
+
+            // windows sig:
+            // search for string "blood_impact_arterial_spray" to find Boomer::DoBloodEffect
+            // down in the 'switch' statement, every cases call CBaseAnimating::LookupAttachment.
+            "CBaseAnimating::LookupAttachment"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating16LookupAttachmentEPKc"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x5D\xC2\x04\x00\x8B\x4D\x08"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 5D C2 04 00 8B 4D 08 */
+            }
+
+            // windows sig:
+            // search for string "smoker_mouth" find the only call which is CTongue::GetSegmentStart
+            // the call under the call that passes "smoker_mouth" is CBaseAnimating::GetAttachment
+            "CBaseAnimating::GetAttachment"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating13GetAttachmentEiR6VectorR6QAngle"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x34\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x8B\x01\x8B\x80\x6C\x03\x00\x00\x53"
+                /* 55 8B EC 83 EC 34 A1 ? ? ? ? 33 C5 89 45 FC 8B 01 8B 80 6C 03 00 00 53 */
+            }
+
+            // windows sig:
+            // find CBaseAnimating::GetAttachmentBone like above.
+            // down the end of the function see this statement "if ( v3 && *v3 && a2 >= 1 && a2 <= sub_101E3D80(v3) )"
+            // the call is CStudioHdr::GetNumAttachments
+            "CStudioHdr::GetNumAttachments"
+            {
+                "library"   "server"
+                "linux"     "@_ZNK10CStudioHdr17GetNumAttachmentsEv"
+                "windows"   "\x8B\x41\x04\x85\xC0\x75\x2A\x8B\x01\x8B\x80\xF0\x00\x00\x00"
+                // may vary?
+                /* 8B 41 04 85 C0 75 ? 8B 01 8B 80 F0 00 00 00 */
+            }
         }
     }
 }

@@ -535,7 +535,7 @@ methodmap CBaseAnimating
      * Set this entity's model.
      * 
      * @note            Same as sourcemod native SetEntityModel().
-     * @note            Once called, it will delete the original CStudioHdr instance of the model of this entity.
+     * @note            Once called, it will delete the original CStudioHdr instance of this entity's model.
      * @note            From Garry's Mod Wiki: "This does not update the physics of the entity."
      * @note            From Garry's Mod Wiki: "This silently fails when given an empty string. (or a string pointed to a none existed model.)"
      * 
@@ -581,6 +581,73 @@ methodmap CBaseAnimating
      * @noreturn
     */
     public native void GetBonePosition(int iBone, float vBoneOrigin[3], float vBoneAngles[3]);
+
+    /**
+     * Gets the bone for an attachment
+     * 
+     * @param iAttachment   The index of the attachment to get the bone for.
+     * 
+     * @return              The bone index for the given attachment ID.
+     *                      0 if iAttachment < 1 || iAttachment > GetNumAttachments() .
+    */
+    public native int GetAttachmentBone(int iAttachment);
+
+    /**
+     * Returns the CBoneCache pointer address of the entity's model.
+     * 
+     * @note            Not existed in SourceSDK 2013, but do existed in L4D2's binary.
+     * 
+     * @return          The address of the pointer.
+    */
+    public native Address GetBoneCache();
+
+    /**
+     * Returns the physics bone index for the given bone index. An index into physically simulated bone
+     * 
+     * @param iBone  The index of the bone to get the physics bone index of.
+     * 
+     * @return      The physics bone index for the given bone index.
+     *              0 if the entity has no model, or the bone index is invalid. (x >= max bone number || x < 0)
+    */
+    public native int GetPhysicsBone(int iBone);
+
+    /**
+     * Gets the bone the hit box is attached to
+     * 
+     * @param iHitboxIndex  The index of the hit box to get the bone for.
+     * 
+     * @return              The bone index for the given hit box index.
+     *                      0 if the entity has no model, or iHitboxIndex >= the number of hitboxes.
+    */
+    public native int GetHitboxBone(int iHitboxIndex);
+
+    /*<------------------->*/
+    /* Attachment Related */
+
+    /**
+     * Returns the attachment index of the given attachment name.
+     * 
+     * @note            Same as sourcemod native LookupAttachment().
+     * 
+     * @param szName    The name of the attachment to get the index of.
+     * 
+     * @return          The index of the given attachment name.
+    */
+    public native int LookupAttachment(const char[] szName);
+
+    /**
+     * Returns the world location and world angles of an attachment.
+     * 
+     * @note                Same as sourcemod native GetEntityAttachment().
+     * @note                Returns nothing if the entity has no model, or the attachment index is invalid. 
+     * 
+     * @param iAttachment   The index of the attachment to get the world location and world angles of.
+     * @param absOrigin     A Vector buffer to store the world location of the attachment.
+     * @param absAngles     A QAngle buffer to store the world angles of the attachment.
+     * 
+     * @return              True if the operation was successful, false otherwise.
+    */
+    public native bool GetAttachment(int iAttachment, float absOrigin[3], float absAngles[3]);
 }
 
 // Listed this native alone because it has no class.
@@ -624,6 +691,16 @@ methodmap CStudioHdr
      * @noreturn
     */
     public native void deleteThis();
+
+    /**
+     * Retrieves the number of attachments in the model.
+     * 
+     * @note            https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.cpp#L1093
+     * 
+     * @return          The number of attachments in the model.
+     *                  Returns local attachment number if m_pVModel == NULL.
+    */
+    public native int GetNumAttachments();
 }
 
 public SharedPlugin __pl_animating_library = 
@@ -693,10 +770,18 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.LookupBone");
     MarkNativeAsOptional("CBaseAnimating.GetNumBones");
     MarkNativeAsOptional("CBaseAnimating.GetBonePosition");
+    MarkNativeAsOptional("CBaseAnimating.GetAttachmentBone");
+    MarkNativeAsOptional("CBaseAnimating.GetBoneCache");
+    MarkNativeAsOptional("CBaseAnimating.GetPhysicsBone");
+    MarkNativeAsOptional("CBaseAnimating.GetHitboxBone");
+
+    MarkNativeAsOptional("CBaseAnimating.LookupAttachment");
+    MarkNativeAsOptional("CBaseAnimating.GetAttachment");
 
     MarkNativeAsOptional("GetSequenceFlags");
 
     MarkNativeAsOptional("CStudioHdr.CStudioHdr");
     MarkNativeAsOptional("CStudioHdr.deleteThis");
+    MarkNativeAsOptional("CStudioHdr.GetNumAttachments");
 }
 #endif

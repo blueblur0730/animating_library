@@ -105,6 +105,29 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper params30[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_QAngle, SDKPass_ByRef }};
 	g_hSDKCall_GetBonePosition			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBonePosition", params30, sizeof(params30), false, _);
 
+	SDKCallParamsWrapper params31[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret32 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetAttachmentBone		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetAttachmentBone", params31, sizeof(params31), true, ret32);
+
+	SDKCallParamsWrapper ret33 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetBoneCache				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetBoneCache", _, _, true, ret33);
+
+	SDKCallParamsWrapper params32[]		= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret34 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetPhysicsBone			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetPhysicsBone", params32, sizeof(params32), true, ret34);
+
+	SDKCallParamsWrapper params33[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret35 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetHitboxBone			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetHitboxBone", params33, sizeof(params33), true, ret35);
+
+	SDKCallParamsWrapper params34[] 	= {{ SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret36 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_LookupAttachment			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupAttachment", params34, sizeof(params34), true, ret36);
+
+	SDKCallParamsWrapper params35[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_QAngle, SDKPass_ByRef }};
+	SDKCallParamsWrapper ret37 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_GetAttachment			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetAttachment", params35, sizeof(params35), true, ret37);
+
 	switch (gd.OS)
 	{
 		case OS_Windows:
@@ -178,7 +201,10 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 	g_hSDKCall_ModelSoundCache_LoadModel 	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ModelSoundsCache_LoadModel", params, sizeof(params), true, ret);
 
 	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Pointer }};
-	g_hSDKCall_ModelSoundCache_FinishModel = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
+	g_hSDKCall_ModelSoundCache_FinishModel 	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
+
+	SDKCallParamsWrapper ret1				= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_CStudioHdr_GetNumAttachments = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CStudioHdr::GetNumAttachments", _, _, true, ret1);
 }
 
 void RetrieveOffsets(GameDataWrapper gd)
@@ -242,9 +268,17 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.LookupBone", Native_LookupBone);
 	CreateNative("CBaseAnimating.GetNumBones", Native_GetNumBones);
 	CreateNative("CBaseAnimating.GetBonePosition", Native_GetBonePosition);
+	CreateNative("CBaseAnimating.GetAttachmentBone", Native_GetAttachmentBone);
+	CreateNative("CBaseAnimating.GetBoneCache", Native_GetBoneCache);
+	CreateNative("CBaseAnimating.GetPhysicsBone", Native_GetPhysicsBone);
+	CreateNative("CBaseAnimating.GetHitboxBone", Native_GetHitboxBone);
+
+	CreateNative("CBaseAnimating.LookupAttachment", Native_LookupAttachment);
+	CreateNative("CBaseAnimating.GetAttachment", Native_GetAttachment);
 
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 
 	CreateNative("CStudioHdr.CStudioHdr", Native_CStudioHdr);
 	CreateNative("CStudioHdr.deleteThis", Native_CStudioHdr_DeleteThis);
+	CreateNative("CStudioHdr.GetNumAttachments", Native_CStudioHdr_GetNumAttachments);
 }

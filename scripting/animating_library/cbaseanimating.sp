@@ -656,3 +656,72 @@ any Native_GetBonePosition(Handle plugin, int numParams)
 
 	return 0;
 }
+
+int Native_GetAttachmentBone(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iAttachment = GetNativeCell(2);
+
+	return SDKCall(g_hSDKCall_GetAttachmentBone, GetNativeCell(1), iAttachment);
+}
+
+any Native_GetBoneCache(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	return view_as<Address>(SDKCall(g_hSDKCall_GetBoneCache, GetNativeCell(1)));
+}
+
+int Native_GetPhysicsBone(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iBone = GetNativeCell(2);
+
+	return SDKCall(g_hSDKCall_GetPhysicsBone, GetNativeCell(1), iBone);
+}
+
+int Native_GetHitboxBone(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iHitbox = GetNativeCell(2);
+
+	return SDKCall(g_hSDKCall_GetHitboxBone, GetNativeCell(1), iHitbox);
+}
+
+int Native_LookupAttachment(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int maxlength;
+	GetNativeStringLength(2, maxlength);
+	maxlength += 1;
+	char[] name = new char[maxlength];
+	GetNativeString(2, name, maxlength);
+
+	return SDKCall(g_hSDKCall_LookupAttachment, GetNativeCell(1), name);
+}
+
+any Native_GetAttachment(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
+
+	int iAttachment = GetNativeCell(2);
+	float vec[3]; float ang[3];
+	GetNativeArray(3, vec, sizeof(vec));
+	GetNativeArray(4, ang, sizeof(ang));
+
+	SDKCall(g_hSDKCall_GetAttachment, GetNativeCell(1), iAttachment, vec, ang);
+	SetNativeArray(3, vec, sizeof(vec));
+	SetNativeArray(4, ang, sizeof(ang));
+
+	return 0;
+}

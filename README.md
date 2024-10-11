@@ -136,3 +136,13 @@
     2. String length change in CBaseAnimating.LookupSequence.
     3. Changed native name CBaseAnimating.BodyGroupNum.get -> CBaseAnimating.GetBodyGroupNum.
     4. Documentations stuff.
+
+- 10/12/24: v1.7
+  - Natives:
+    1. CBaseAnimating.GetAttachmentBone
+    2. CBaseAnimating.GetBoneCache
+    3. CBaseAnimating.GetPhysicsBone
+    4. CBaseAnimating.GetHitboxBone
+    5. CBaseAnimating.LookupAttachment
+    6. CBaseAnimating.GetAttachment
+    7. CStudioHdr.GetNumAttachments

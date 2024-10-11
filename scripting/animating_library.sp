@@ -7,12 +7,13 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.6.1"
+#define PLUGIN_VERSION "1.7"
 
 Handle
 	// these two is to get and delete a new CStudioHdr instance.
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
 	g_hSDKCall_ModelSoundCache_FinishModel = null,
+	g_hSDKCall_CStudioHdr_GetNumAttachments = null,
 
 	g_hSDKCall_GetSequenceFlags			= null,
 
@@ -52,7 +53,15 @@ Handle
 	g_hSDKCall_SetModel					= null,
 
 	g_hSDKCall_LookupBone				= null,
-	g_hSDKCall_GetBonePosition			= null;
+	g_hSDKCall_GetBonePosition			= null,
+	g_hSDKCall_GetAttachmentBone		= null,
+	g_hSDKCall_GetBoneCache				= null,
+	g_hSDKCall_GetPhysicsBone			= null,
+	g_hSDKCall_GetHitboxBone			= null,
+
+	g_hSDKCall_LookupAttachment			= null,
+	g_hSDKCall_GetAttachment			= null;
+
 
 int 
 	g_iOffset_pStudioHdr = -1,
