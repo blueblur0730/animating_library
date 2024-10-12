@@ -120,6 +120,8 @@ methodmap CBaseAnimating
     /**
      * Retrieve the string value of a specific Body Group ID.
      * 
+     * @note            Return an empty string if the entity has no model, or an invalid Body Group ID.
+     * 
      * @param iGroup    The Body Group ID to get. Starting from 0.
      * @param name      The buffer to store the name of the Body Group.
      * 
@@ -664,6 +666,64 @@ methodmap CBaseAnimating
 */
 native int GetSequenceFlags(int entity, int sequence);
 
+// Activity List
+// https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/shared/activitylist.cpp
+// all activity index should be parsed by left4dhooks_anim.inc.
+// could have a consideration of things like: https://developer.valvesoftware.com/wiki/Adding_Weapon_Inspect
+
+/**
+ * Register a new shared activity to the game's activity database (Activity List).
+ * 
+ * @note                    If this function returns false, the console should print: "***\nShared activity collision! %s<->%s\n***\n"
+ * 
+ * @param pszActivityName   The name of the activity to register.
+ * @param iActivityIndex    The index of the activity to register.
+ * 
+ * @return                  True if the operation was successful, false if the name or index has already been registered.
+*/
+native bool ActivityList_RegisterSharedActivity(const char[] pszActivityName, int iActivityIndex);
+
+/**
+ * Register a new private activity to the game's activity database (Activity List).                
+ * 
+ * @param pszActivityName   The name of the activity to register.
+ * 
+ * @return                  The index of the registered activity. Normally, this indicates g_HighestActivity + 1. 
+ *                          -1 (ACT_INVALID) if the name collides with a shared activity. 
+ *                          If the name collides with a already registered private activity, returns the index of the existing private activity.
+*/
+native int ActivityList_RegisterPrivateActivity(const char[] pszActivityName);
+
+/**
+ * Get the index for a given activity name
+ * 
+ * @note                    From SDK: "Done at load time for all models."
+ * @note                    This function searches activity name through activitylist_t, compared with LookupActivity() which searches through mstudioseqdesc_t, which should be local.
+ * 
+ * @param pszActivityName   The name of the activity to get the index of.
+ * 
+ * @return                  The index of the given activity name.
+*/
+native int ActivityList_IndexForName(const char[] pszActivityName);
+
+/**
+ * Get the name for a given index.
+ * 
+ * @note                    Return NULL (c++), which should be NULL_STRING in sp on none existed index.
+ * 
+ * @param activityIndex     The index of the activity to get the name of.
+ * @param pszActivityName   A buffer to store the name of the activity.
+ * 
+ * @noreturn
+*/
+native void ActivityList_NameForIndex(int activityIndex, char[] pszActivityName);
+
+/**
+ * Get the highest activity index.
+ * 
+ * @return                  The highest activity index.
+*/
+native int ActivityList_HighestActivity();
 
 methodmap CStudioHdr
 {
@@ -779,6 +839,11 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.GetAttachment");
 
     MarkNativeAsOptional("GetSequenceFlags");
+    MarkNativeAsOptional("ActivityList_RegisterSharedActivity");
+    MarkNativeAsOptional("ActivityList_RegisterPrivateActivity");
+    MarkNativeAsOptional("ActivityList_IndexForName");
+    MarkNativeAsOptional("ActivityList_NameForIndex");
+    MarkNativeAsOptional("ActivityList_HighestActivity");
 
     MarkNativeAsOptional("CStudioHdr.CStudioHdr");
     MarkNativeAsOptional("CStudioHdr.deleteThis");

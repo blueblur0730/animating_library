@@ -21,6 +21,28 @@
     {
         "Addresses"
         {
+            //---------------------------
+            // Global variables Address
+            //---------------------------
+
+            "g_HighestActivity"
+            {
+                "linux"
+                {
+                    "signature" "g_HighestActivity"
+                }
+                
+                "windows"
+                {
+                    "signature" "ActivityList_RegisterPrivateActivity"
+                    "offset"    "0x45"  // sub_10002680+43   8B 15 D0 F2 7C 10                 mov     edx, dword_107CF2D0
+                }
+            }
+
+            //---------------------------------
+            // Relative function call Address
+            //---------------------------------
+
             "CBaseAnimating::FindBodyGroupByName"
             {
                 "linux"
@@ -44,8 +66,8 @@
 
                 "windows"
                 {
-                    "signature" "GetScriptDesc<CBaseAnimating>"
-                    "offset"    "0x644" // mov     dword ptr [esi+28h], offset sub_10032AA0
+                    // so we just call this directly.
+                    "signature" "GetBodygroupName"
                 }
             }
 
@@ -72,8 +94,8 @@
 
                 "windows"
                 {
-                    "signature" "GetScriptDesc<CBaseAnimating>"
-                    "offset"    "0x411" // sub_10038EB0+411  C7 46 28 70 1A 03 10                 mov     dword ptr [esi+28h], offset sub_10031A70
+                    "signature" "CBaseAnimating::ResetSequence"
+                    "offset"    "0x39" // sub_10038B90+39   E8 A2 8E FF FF                    call    sub_10031A70
                 }
             }
 
@@ -86,8 +108,8 @@
 
                 "windows"
                 {
-                    "signature" "GetScriptDesc<CBaseAnimating>"
-                    "offset"    "0x3C0" // sub_10038EB0+3C0  C7 46 28 D0 1A 03 10                mov     dword ptr [esi+28h], offset sub_10031AD0
+                    "signature" "Infected::DrawDebugTextOverlays"
+                    "offset"    "0x13F" // sub_103FFEA0+13F  E8 EC 1A C3 FF                    call    sub_10031AD0
                 }
             }
 
@@ -121,6 +143,10 @@
 
         "Offsets"
         {
+            //-------------------------------
+            // Class/Struct property offsets
+            //-------------------------------
+
             "CBaseAnimating->m_pStudioHdr"
             {
                 "linux"     "5088"  // 0x13E0
@@ -132,8 +158,8 @@
             // see what var could possibly be relative to bone numbers returned by the pointer + offset.
             "studiohdr_t->numbones"
             {
-                "windows"	"156"
                 "linux"	    "156"
+                "windows"	"156"
             }
 
             //--------------------------
@@ -173,6 +199,20 @@
 
         "Signatures"
         {
+            //---------------------------
+            // Global variable addresses
+            //---------------------------
+
+            "g_HighestActivity"
+            {
+                "library"   "server"
+                "linux"     "@_ZL17g_HighestActivity"
+            }
+
+            //-----------------------------------------
+            // Relative function call target functions
+            //-----------------------------------------
+
             // search for string "D%d_%c%d_%s"
             "Infected::SetDamagedBodyGroupVariant"
             {
@@ -181,12 +221,14 @@
                 /* 55 8B EC 83 EC 3C A1 ? ? ? ? 33 C5 89 45 FC 8B 45 08 53 56 */
             }
 
-            // search for string "Get the bodygroup id's name" or any other.
-            "GetScriptDesc<CBaseAnimating>"
+            // search for string "Find a bodygroup id by name" to find GetScriptDesc<CBaseAnimating>
+            // right above the string there's an array with element represents [10] (vxx[10]), the call next to it is CBaseAnimating::GetBodygroupName
+            // click into it, the last call is GetBodygroupName
+            "GetBodygroupName"
             {
                 "library"   "server"
-                "windows"   "\x80\x3D\x2A\x2A\x2A\x2A\x00\x0F\x85\x2A\x2A\x2A\x2A\x53\x56\xB8\x2A\x2A\x2A\x2A\x57\xBB\x01\x00\x00\x00\x6A\x00\x88\x1D\x2A\x2A\x2A\x2A\xC7\x05\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xA3\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x83\xC4\x04\xA3\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x83\x78\x2C\x00\x75\x2A\x8B\x40\x0C\x85\xC0\x75\x2A\xEB\x2A\x8B\x40\x2C\xA3\x2A\x2A\x2A\x2A\x8B\x0D\x2A\x2A\x2A\x2A\x51\xB9\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8D\x34\x40"
-                /* 80 3D ? ? ? ? 00 0F 85 ? ? ? ? 53 56 B8 ? ? ? ? 57 BB 01 00 00 00 6A 00 88 1D ? ? ? ? C7 05 ? ? ? ? ? ? ? ? A3 ? ? ? ? A3 ? ? ? ? E8 ? ? ? ? 83 C4 04 A3 ? ? ? ? 85 C0 74 ? 83 78 2C 00 75 ? 8B 40 0C 85 C0 75 ? EB ? 8B 40 2C A3 ? ? ? ? 8B 0D ? ? ? ? 51 B9 ? ? ? ? E8 ? ? ? ? 8D 34 40 */
+                "windows"   "\x55\x8B\xEC\x8B\x45\x08\x85\xC0\x75\x2A\xB8\x2A\x2A\x2A\x2A\x5D\xC3\x8B\x00"
+                /* 55 8B EC 8B 45 08 85 C0 75 ? B8 ? ? ? ? 5D C3 8B 00 */
             }
 
             // search for string "Dynamic prop %s: no sequence named:%s\n"
@@ -206,26 +248,17 @@
                 /* 55 8B EC 83 EC 20 56 89 4D F8 */
             }
 
-            // windows sig:
-            // find CModelSoundsCache::Rebuild on its own vtable (offset 2)
-            // the first call is it.
-            "ModelSoundsCache_LoadModel"
+            // search for string "Layer %d (%s): order %d weight %f cycle %f"
+            "Infected::DrawDebugTextOverlays"
             {
                 "library"   "server"
-                "linux"     "@_Z26ModelSoundsCache_LoadModelPKc"
-                "windows"   "\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x55\x08\x8B\x40\x14"
-                /* 55 8B EC 8B 0D ? ? ? ? 8B 01 8B 55 08 8B 40 14 */
+                "windows"   "\x55\x8B\xEC\x81\xEC\x08\x08\x00\x00\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x53\x56\x57\x8B\xF1"
+                /* 55 8B EC 81 EC 08 08 00 00 A1 ? ? ? ? 33 C5 89 45 FC 53 56 57 8B F1 */
             }
 
-            // windows sig:
-            // same as above, the third call is it.
-            "ModelSoundsCache_FinishModel"
-            {
-                "library"   "server"
-                "linux"     "@_Z28ModelSoundsCache_FinishModelP10CStudioHdr"
-                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x08\x85\xF6\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8D\x4E\x40"
-                /* 55 8B EC 56 8B 75 08 85 F6 74 ? 8B CE E8 ? ? ? ? 8D 4E 40 */
-            }
+            //--------------------------------
+            // CBaseAnimating functions
+            //--------------------------------
 
             "CBaseAnimating::FindBodyGroupByName"
             {
@@ -464,25 +497,13 @@
             }
 
             // windows sig:
-            // search for string "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n" to find CBaseFlex::HandleStartGestureSceneEvent
-            // (or any other long strings)
-            // down the buttom of the function, this string (above) is in a 'if' statement, the call in the statement is GetSequenceFlags.
-            "GetSequenceFlags"
-            {
-                "library"   "server"
-                "linux"     "@_Z16GetSequenceFlagsP10CStudioHdri"
-                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x85\xFF\x74\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x84\xC0\x74\x2A\x8B\x75\x0C\x85\xF6\x78\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x3B\xF0\x7D\x2A\x56\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x8B\x40\x0C"
-                /*  55 8B EC 56 57 8B 7D 08 85 FF 74 ? 8B CF E8 ? ? ? ? 84 C0 74 ? 8B 75 0C 85 F6 78 ? 8B CF E8 ? ? ? ? 3B F0 7D ? 56 8B CF E8 ? ? ? ? 8B 40 0C*/
-            }
-
-            // windows sig:
             // search for string "ResetSequence : %s: %s -> %s\n"
             "CBaseAnimating::ResetSequence"
             {
                 "library"   "server"
                 "linux"     "@_ZN14CBaseAnimating14ResetSequenceEi"
-                "windows"   "\x55\x8B\xEC\x53\x56\x57\x8B\x7D\x08\x8B\x07\x8B\x50\x1C"
-                /* 55 8B EC 53 56 57 8B 7D 08 8B 07 8B 50 1C */
+                "windows"   "\x55\x8B\xEC\xA1\x2A\x2A\x2A\x2A\x83\x78\x30\x00\x53\x56\x57\x8B\xF1"
+                /* 55 8B EC A1 ? ? ? ? 83 78 30 00 53 56 57 8B F1 */
             }
 
             // windows sig:
@@ -618,6 +639,31 @@
                 /* 55 8B EC 83 EC 34 A1 ? ? ? ? 33 C5 89 45 FC 8B 01 8B 80 6C 03 00 00 53 */
             }
 
+            //--------------------------------
+            // CStudioHdr functions
+            //--------------------------------
+
+            // windows sig:
+            // find CModelSoundsCache::Rebuild on its own vtable (offset 2)
+            // the first call is it.
+            "ModelSoundsCache_LoadModel"
+            {
+                "library"   "server"
+                "linux"     "@_Z26ModelSoundsCache_LoadModelPKc"
+                "windows"   "\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x55\x08\x8B\x40\x14"
+                /* 55 8B EC 8B 0D ? ? ? ? 8B 01 8B 55 08 8B 40 14 */
+            }
+
+            // windows sig:
+            // same as above, the third call is it.
+            "ModelSoundsCache_FinishModel"
+            {
+                "library"   "server"
+                "linux"     "@_Z28ModelSoundsCache_FinishModelP10CStudioHdr"
+                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x08\x85\xF6\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8D\x4E\x40"
+                /* 55 8B EC 56 8B 75 08 85 F6 74 ? 8B CE E8 ? ? ? ? 8D 4E 40 */
+            }
+
             // windows sig:
             // find CBaseAnimating::GetAttachmentBone like above.
             // down the end of the function see this statement "if ( v3 && *v3 && a2 >= 1 && a2 <= sub_101E3D80(v3) )"
@@ -629,6 +675,66 @@
                 "windows"   "\x8B\x41\x04\x85\xC0\x75\x2A\x8B\x01\x8B\x80\xF0\x00\x00\x00"
                 // may vary?
                 /* 8B 41 04 85 C0 75 ? 8B 01 8B 80 F0 00 00 00 */
+            }
+
+            //-------------------
+            // Static functions
+            //-------------------
+
+            // windows sig:
+            // search for string "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n" to find CBaseFlex::HandleStartGestureSceneEvent
+            // (or any other long strings)
+            // down the buttom of the function, this string (above) is in a 'if' statement, the call in the statement is GetSequenceFlags.
+            "GetSequenceFlags"
+            {
+                "library"   "server"
+                "linux"     "@_Z16GetSequenceFlagsP10CStudioHdri"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x85\xFF\x74\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x84\xC0\x74\x2A\x8B\x75\x0C\x85\xF6\x78\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x3B\xF0\x7D\x2A\x56\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x8B\x40\x0C"
+                /*  55 8B EC 56 57 8B 7D 08 85 FF 74 ? 8B CF E8 ? ? ? ? 84 C0 74 ? 8B 75 0C 85 F6 78 ? 8B CF E8 ? ? ? ? 3B F0 7D ? 56 8B CF E8 ? ? ? ? 8B 40 0C*/
+            }
+
+            // windows sig:
+            // search for string "***\nShared activity collision! %s<->%s\n***\n".
+            "ActivityList_RegisterSharedActivity"
+            {
+                "library"   "server"
+                "linux"     "@_Z35ActivityList_RegisterSharedActivityPKci"
+                "windows"   "\x55\x8B\xEC\x56\x8B\x75\x0C\x57\x8B\x7D\x08\x57"
+                /* 55 8B EC 56 8B 75 0C 57 8B 7D 08 57 */
+            }
+
+            // windows sig:
+            // search for string "***\nShared<->Private Activity collision!\n***\n"
+            "ActivityList_RegisterPrivateActivity"
+            {
+                "library"   "server"
+                "linux"     "@_Z36ActivityList_RegisterPrivateActivityPKc"
+                "windows"   "\x55\x8B\xEC\x57\x8B\x7D\x08\x57\xB9\x2A\x2A\x2A\x2A"
+                /* 55 8B EC 57 8B 7D 08 57 B9 ? ? ? ? */
+            }
+
+            // windows sig:
+            // search for string "ValveBiped.bip01_pelvis" to find InfectedDying::TryToStartDeathThroes
+            // just down there a string named "Head" is below "ValveBiped.bip01_pelvis"
+            // notice the 'if' statement "if ( v12 == -1 )" is below the string "Head"
+            // inside of it the second call is ActivityList_IndexForName.
+            "ActivityList_IndexForName"
+            {
+                "library"   "server"
+                "linux"     "@_Z25ActivityList_IndexForNamePKc"
+                "windows"   "\x55\x8B\xEC\x8B\x45\x08\x50\xB9\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x78\x2A\x8B\x0D\x2A\x2A\x2A\x2A"
+                /* 55 8B EC 8B 45 08 50 B9 ? ? ? ? E8 ? ? ? ? 85 C0 78 ? 8B 0D ? ? ? ? */
+            }
+
+            // windows sig: 
+            // search for string "ACT_INVALID" to find the only call with "mov" opcode, this is CAI_BaseNPC::GetActivityName.
+            // it has the only call in it, which is ActivityList_NameForIndex.
+            "ActivityList_NameForIndex"
+            {
+                "library"   "server"
+                "linux"     "@_Z25ActivityList_NameForIndexi"
+                "windows"   "\x55\x8B\xEC\x8B\x15\x2A\x2A\x2A\x2A\x33\xC0"
+                /* 55 8B EC 8B 15 ? ? ? ? 33 C0 */
             }
         }
     }

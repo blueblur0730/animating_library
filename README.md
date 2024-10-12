@@ -146,3 +146,16 @@
     5. CBaseAnimating.LookupAttachment
     6. CBaseAnimating.GetAttachment
     7. CStudioHdr.GetNumAttachments
+
+- 10/12/24: v1.7.1
+  - Natives:
+    1. ActivityList_RegisterSharedActivity
+    2. ActivityList_RegisterPrivateActivity
+    3. ActivityList_IndexForName
+    4. ActivityList_NameForIndex
+    5. ActivityList_HighestActivity
+
+  - Changes:
+    1. Updated gamedata. Most windows call, which need a relative call address, that pointed to GetScriptDesc<\CBaseAnimating> in previous version, has been redirect to a new proper function that can make a relative call address.
+    2. CBaseAnimating.GetBodyGroupName has difference on linux and windows now. While linux platform calls the original CBaseAnimating::GetBodyGroupName(), windows platform calls GetBodyGroupName() directly.
+    3. Fixed string param pass in SDKCall.

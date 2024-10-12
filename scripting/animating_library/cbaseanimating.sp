@@ -116,9 +116,29 @@ int Native_GetBodyGroupName(Handle plugin, int numParams)
 	GetNativeStringLength(3, maxlength);
 	maxlength += 1;
 	char[] name = new char[maxlength];
-	GetNativeString(3, name, maxlength + 1);
+	GetNativeString(3, name, maxlength);
 
-	SDKCall(g_hSDKCall_GetBodyGroupName, GetNativeCell(1), iGroup, name, maxlength);
+	switch (g_iOS)
+	{
+		case OS_Windows:
+		{
+			// calling GetBodygroupName(CStudioHdr *a1, int a2)
+			Address pStudioHdr = GetModelPtr(view_as<Address>(GetNativeCell(1)));
+			SDKCall(g_hSDKCall_GetBodyGroupName, pStudioHdr, name, maxlength, iGroup);
+		}
+
+		case OS_Linux:
+		{
+			// calling CBaseAnimating::GetBodygroupName(CBaseAnimating *this, int a2)
+			SDKCall(g_hSDKCall_GetBodyGroupName, GetNativeCell(1), name, maxlength, iGroup);	// third param must be string, fouth must be size.
+		}
+
+		case OS_Unknown:
+		{
+			ThrowNativeError(SP_ERROR_ABORTED, "Faild to retrieve operating system offsets when calling function.");
+		}
+	}
+
 	SetNativeString(3, name, maxlength);
 
 	return 0;
@@ -141,7 +161,7 @@ int Native_GetBodyGroupPartName(Handle plugin, int numParams)
 	char[] name = new char[maxlength];
 	GetNativeString(4, name, maxlength + 1);
 
-	SDKCall(g_hSDKCall_GetBodyGroupPartName, GetNativeCell(1), iGroup, iPart, name, maxlength);
+	SDKCall(g_hSDKCall_GetBodyGroupPartName, GetNativeCell(1), name, maxlength, iGroup, iPart);
 	SetNativeString(4, name, maxlength);
 
 	return 0;
@@ -285,7 +305,7 @@ int Native_GetSequenceName(Handle plugin, int numParams)
 	char[] name = new char[maxlength];
 	GetNativeString(3, name, maxlength + 1);
 
-	SDKCall(g_hSDKCall_GetSequenceName, GetNativeCell(1), iSequence, name, maxlength);
+	SDKCall(g_hSDKCall_GetSequenceName, GetNativeCell(1), name, maxlength, iSequence);
 	SetNativeString(3, name, maxlength);
 
 	return 0;
@@ -314,7 +334,7 @@ int Native_GetSequenceActivityName(Handle plugin, int numParams)
 	char[] name = new char[maxlength];
 	GetNativeString(3, name, maxlength + 1);
 
-	SDKCall(g_hSDKCall_GetSequenceActivityName, GetNativeCell(1), iSequence, name, maxlength);
+	SDKCall(g_hSDKCall_GetSequenceActivityName, GetNativeCell(1), name, maxlength, iSequence);
 	SetNativeString(3, name, maxlength);
 
 	return 0;
@@ -626,7 +646,7 @@ int Native_LookupBone(Handle plugin, int numParams)
 }
 
 // you can call CBaseAnimating::GetNumBones, but you may only find linux signature since there's no function calls this function,
-// and it's not a virtual function so you know it windows is dead. (or you can try youself to find it)
+// and it's not a virtual function so you know it windows is dead. (or you can try to find it yourself)
 // so we just load this value from studiohdr_t->numbones.
 // https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L2383
 // https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/public/studio.h#L2087
@@ -672,7 +692,7 @@ any Native_GetBoneCache(Handle plugin, int numParams)
 	if (!ValidateAddress(GetNativeCell(1)))
 		ThrowNativeError(SP_ERROR_PARAM, "Invalid CBaseAnimating object.");
 
-	return view_as<Address>(SDKCall(g_hSDKCall_GetBoneCache, GetNativeCell(1)));
+	return view_as<Address>(SDKCall(g_hSDKCall_GetBoneCache, view_as<Address>(GetNativeCell(1))));
 }
 
 int Native_GetPhysicsBone(Handle plugin, int numParams)

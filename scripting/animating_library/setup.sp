@@ -5,8 +5,6 @@
 
 void CreateSDKCalls(GameDataWrapper	gd)
 {
-	CreateCStuidoHdrSDKCalls(gd);
-
 	// weird sourcemod shit
 	// https://forums.alliedmods.net/showthread.php?t=344325
 	SDKCallParamsWrapper ret 			= { SDKType_PlainOldData, SDKPass_Plain };
@@ -71,10 +69,6 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper ret21 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_IsValidSequence			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::IsValidSequence", params20, sizeof(params20), true, ret21);
 
-	SDKCallParamsWrapper params21[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }, {SDKType_PlainOldData, SDKPass_Plain}};
-	SDKCallParamsWrapper ret22 			= { SDKType_PlainOldData, SDKPass_Plain };
-	g_hSDKCall_GetSequenceFlags			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "GetSequenceFlags", params21, sizeof(params21), true, ret22);
-
 	SDKCallParamsWrapper params22[] 	= {{SDKType_PlainOldData, SDKPass_Plain}};
 	g_hSDKCall_ResetSequence			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::ResetSequence", params22, sizeof(params22), false, _);
 
@@ -128,6 +122,8 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper ret37 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_GetAttachment			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetAttachment", params35, sizeof(params35), true, ret37);
 
+	g_iOS = gd.OS;
+
 	switch (gd.OS)
 	{
 		case OS_Windows:
@@ -140,9 +136,11 @@ void CreateSDKCalls(GameDataWrapper	gd)
 			SDKCallParamsWrapper ret9 			= { SDKType_PlainOldData, SDKPass_Plain };
 			g_hSDKCall_GetBodyGroupCount		= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetBodyGroupCount", params7, sizeof(params7), true, ret9);
 
+			// this comes a little special. we are actually calling GetBodyGroupName() with a searchable address.
+			// the native will rebuild CBaseAnimating::GetBodyGroupName.
 			SDKCallParamsWrapper params8[] 		= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret10 			= { SDKType_String, SDKPass_Pointer };
-			g_hSDKCall_GetBodyGroupName			= gd.CreateSDKCallOrFailEx(SDKCall_Raw, "CBaseAnimating::GetBodyGroupName", params8, sizeof(params8), true, ret10);
+			g_hSDKCall_GetBodyGroupName			= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Address, "CBaseAnimating::GetBodyGroupName", params8, sizeof(params8), true, ret10);
 
 			SDKCallParamsWrapper params11[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
 			SDKCallParamsWrapper ret13 			= { SDKType_String, SDKPass_Pointer };
@@ -192,6 +190,32 @@ void CreateSDKCalls(GameDataWrapper	gd)
 			g_hSDKCall_LookupBone 				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupBone", params29, sizeof(params29), true, ret30);
 		}
 	}
+
+	CreateStaticSDKCalls(gd);
+	CreateCStuidoHdrSDKCalls(gd);
+}
+
+void CreateStaticSDKCalls(GameDataWrapper gd)
+{
+	SDKCallParamsWrapper params[] 					= {{ SDKType_PlainOldData, SDKPass_Pointer }, {SDKType_PlainOldData, SDKPass_Plain}};
+	SDKCallParamsWrapper ret 						= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_GetSequenceFlags						= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "GetSequenceFlags", params, sizeof(params), true, ret);
+
+	SDKCallParamsWrapper params1[] 					= {{ SDKType_String, SDKPass_Pointer }, { SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret1 						= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_ActivityList_RegisterSharedActivity	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ActivityList_RegisterSharedActivity", params1, sizeof(params1), true, ret1);
+
+	SDKCallParamsWrapper params2[] 					= {{ SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret2 						= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_ActivityList_RegisterPrivateActivity	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ActivityList_RegisterPrivateActivity", params2, sizeof(params2), true, ret2);
+
+	SDKCallParamsWrapper params3[] 					= {{ SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret3 						= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_ActivityList_IndexForName			= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ActivityList_IndexForName", params3, sizeof(params3), true, ret3);
+
+	SDKCallParamsWrapper params4[] 					= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret4 						= { SDKType_String, SDKPass_Pointer };
+	g_hSDKCall_ActivityList_NameForIndex			= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ActivityList_NameForIndex", params4, sizeof(params4), true, ret4);
 }
 
 void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
@@ -201,7 +225,7 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 	g_hSDKCall_ModelSoundCache_LoadModel 	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ModelSoundsCache_LoadModel", params, sizeof(params), true, ret);
 
 	SDKCallParamsWrapper params1[] 			= {{ SDKType_PlainOldData, SDKPass_Pointer }};
-	g_hSDKCall_ModelSoundCache_FinishModel 	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
+	g_hSDKCall_ModelSoundCache_FinishModel 	= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ModelSoundsCache_FinishModel", params1, sizeof(params1), false, _);
 
 	SDKCallParamsWrapper ret1				= { SDKType_PlainOldData, SDKPass_Plain };
 	g_hSDKCall_CStudioHdr_GetNumAttachments = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CStudioHdr::GetNumAttachments", _, _, true, ret1);
@@ -211,6 +235,11 @@ void RetrieveOffsets(GameDataWrapper gd)
 {
 	g_iOffset_pStudioHdr = gd.GetOffset("CBaseAnimating->m_pStudioHdr");
 	g_iOffset_numbones	 = gd.GetOffset("studiohdr_t->numbones");
+}
+
+void RetrieveAddress(GameDataWrapper gd)
+{
+	g_HighestActivity = gd.GetAddress("g_HighestActivity");
 }
 
 void CreateNatives()
@@ -277,6 +306,11 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.GetAttachment", Native_GetAttachment);
 
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
+	CreateNative("ActivityList_RegisterSharedActivity", Native_ActivityList_RegisterSharedActivity);
+	CreateNative("ActivityList_RegisterPrivateActivity", Native_ActivityList_RegisterPrivateActivity);
+	CreateNative("ActivityList_IndexForName", Native_ActivityList_IndexForName);
+	CreateNative("ActivityList_NameForIndex", Native_ActivityList_NameForIndex);
+	CreateNative("ActivityList_HighestIndex", Native_ActivityList_HighestIndex);
 
 	CreateNative("CStudioHdr.CStudioHdr", Native_CStudioHdr);
 	CreateNative("CStudioHdr.deleteThis", Native_CStudioHdr_DeleteThis);

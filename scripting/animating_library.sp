@@ -7,15 +7,18 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.7"
+#define PLUGIN_VERSION "1.7.1"
 
 Handle
-	// these two is to get and delete a new CStudioHdr instance.
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
 	g_hSDKCall_ModelSoundCache_FinishModel = null,
 	g_hSDKCall_CStudioHdr_GetNumAttachments = null,
 
-	g_hSDKCall_GetSequenceFlags			= null,
+	g_hSDKCall_GetSequenceFlags						= null,
+	g_hSDKCall_ActivityList_RegisterSharedActivity	= null,
+	g_hSDKCall_ActivityList_RegisterPrivateActivity = null,
+	g_hSDKCall_ActivityList_IndexForName			= null,
+	g_hSDKCall_ActivityList_NameForIndex			= null,
 
 	g_hSDKCall_GetBaseAnimating		  	= null,
 	g_hSDKCall_FindBodyGroupByName	  	= null,
@@ -67,10 +70,15 @@ int
 	g_iOffset_pStudioHdr = -1,
 	g_iOffset_numbones	 = -1;
 
+OperatingSystem g_iOS;
+
+Address g_HighestActivity = Address_Null;
+
 #include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"
 #include "animating_library/cstudiohdr.sp"
 #include "animating_library/animation.sp"
+#include "animating_library/activitylist.sp"
 
 public Plugin myinfo =
 {
@@ -78,7 +86,7 @@ public Plugin myinfo =
 	author = "blueblur",
 	description = "Just a library for Animating.",
 	version	= PLUGIN_VERSION,
-	url	= "https://github.com/blueblur0730/modified-plugins"
+	url	= "https://github.com/blueblur0730/animating_library"
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -105,6 +113,7 @@ public void OnPluginStart()
 
 	CreateSDKCalls(gd);
 	RetrieveOffsets(gd);
+	RetrieveAddress(gd);
 
 	delete gd;
 }
