@@ -159,3 +159,7 @@
     1. Updated gamedata. Most windows call, which need a relative call address, that pointed to GetScriptDesc<\CBaseAnimating> in previous version, has been redirect to a new proper function that can make a relative call address.
     2. CBaseAnimating.GetBodyGroupName has difference on linux and windows now. While linux platform calls the original CBaseAnimating::GetBodyGroupName(), windows platform calls GetBodyGroupName() directly.
     3. Fixed string param pass in SDKCall.
+
+- 10/13/24: v1.7.2
+  - Changes:
+    1. Relocation of files.

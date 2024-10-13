@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.7.1"
+#define PLUGIN_VERSION "1.7.2"
 
 Handle
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
@@ -77,8 +77,7 @@ Address g_HighestActivity = Address_Null;
 #include "animating_library/setup.sp"
 #include "animating_library/cbaseanimating.sp"
 #include "animating_library/cstudiohdr.sp"
-#include "animating_library/animation.sp"
-#include "animating_library/activitylist.sp"
+#include "animating_library/static.sp"
 
 public Plugin myinfo =
 {
