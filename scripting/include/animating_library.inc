@@ -4,16 +4,32 @@
 #define _animating_libarary_
 
 /**
- * Animating library for l4d2.
+ * Animating library for L4D2.
  * 
  * Every entity that has a model uses CBaseAnimating. Classes derived from CBaseAnimating can set a model and animate.
  * It also enables entities to display a studio model.
+ * 
  * For most of their original functions, please see here:
  * https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/server/baseanimating.cpp
  * https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/server/baseanimating.h
  * 
  * Garry's Mod Wiki as reference:
  * https://wiki.facepunch.com/gmod/Entity
+ * 
+ * Other References:
+ * https://twhl.info/wiki/page/Entity_Programming_-_Introduction_to_Entities_with_Animated_Models
+ * 
+ * For bodygroup documentations, see here:
+ * https://developer.valvesoftware.com/wiki/$bodygroup
+ * 
+ * For sequence documentations, see here:
+ * https://developer.valvesoftware.com/wiki/$sequence
+ * https://developer.valvesoftware.com/wiki/CBaseAnimating
+ * https://srcents.miraheze.org/wiki/CBaseAnimating
+ * https://developer.valvesoftware.com/wiki/Animating_a_model
+ * 
+ * For pose parameters, see here:
+ * https://developer.valvesoftware.com/wiki/$poseparameter
  * 
  * For weapons, please specifies the world model(w_model) and the view model(v_model), which has a different entity index in the game, when using the natives.
  * 
@@ -56,9 +72,6 @@ methodmap CBaseAnimating
     /*<------------------>*/
     /* BodyGroup Related */
 
-    // For bodygroup documentations see here:
-    // https://developer.valvesoftware.com/wiki/$bodygroup
-
     /**
      * Get/Set the value of m_nBody.
      * 
@@ -79,13 +92,10 @@ methodmap CBaseAnimating
     */
     public native int FindBodyGroupByName(const char[] name);
 
-    // if you are wondering these names well that is what it names.
-
     /**
-     * Sets the given Body Group ID to the given value.
+     * Sets the Bodypart (iValue) of a chosen Bodygroup ID (iGroup).
      * 
      * @note            From the SDK: "SetBodygroup is not supported on pending dynamic models. Wait for it to load!"
-     * @note            iValue is actually a boolean arugument. only 0 or 1 is allowed.
      * 
      * @param iGroup    The Body Group ID to set. Starting from 0.
      * @param iValue    The value to set to.
@@ -95,7 +105,7 @@ methodmap CBaseAnimating
     public native void SetBodyGroup(int iGroup, int iValue);
 
     /**
-     * Returns the Sub Model ID for the currently active Sub Model of the Body Group corresponding to the given Body Group ID.
+     * Gets the current Bodypart ID of the given Bodygroup ID.
      * 
      * @param iGroup    The Body Group ID to get. Starting from 0.
      * 
@@ -224,12 +234,6 @@ methodmap CBaseAnimating
 
     /*<---------------->*/
     /* Sequence Related */
-
-    // see documenation here:
-    // https://developer.valvesoftware.com/wiki/$sequence
-    // https://developer.valvesoftware.com/wiki/CBaseAnimating
-    // https://srcents.miraheze.org/wiki/CBaseAnimating
-    // https://developer.valvesoftware.com/wiki/Animating_a_model
 
     // Any sequence number should be >= 0.
     // bad seqeunce number may cause some unknown errors.
@@ -597,8 +601,6 @@ methodmap CBaseAnimating
     /**
      * Returns the CBoneCache pointer address of the entity's model.
      * 
-     * @note            Not existed in SourceSDK 2013, but do existed in L4D2's binary.
-     * 
      * @return          The address of the pointer.
     */
     public native Address GetBoneCache();
@@ -650,6 +652,125 @@ methodmap CBaseAnimating
      * @return              True if the operation was successful, false otherwise.
     */
     public native bool GetAttachment(int iAttachment, float absOrigin[3], float absAngles[3]);
+
+    /*<----------------------->*/
+    /* Pose Parameter Related */
+
+    /**
+     * Returns the element index of the given pose parameter name.
+     * 
+     * @param szName        The name of the pose parameter to get the element index of.
+     * 
+     * @return              The element index of the given pose parameter name.
+     *                      0 if the entity has no model or sequence is not available, -1 on not found.
+    */
+    public native int LookupPoseParameter(const char[] szName);
+
+    /**
+     * Returns the value of the given pose parameter index.
+     * 
+     * @note                May have bug? See Garry's Mod Wiki: https://wiki.facepunch.com/gmod/Entity:GetPoseParameter
+     * 
+     * @param iParameter    The index of the pose parameter to get the value of.
+     * 
+     * @return              The value of the given pose parameter index.
+     *                      0.0 if the entity has no model or sequence is not available or bad iParameter index (x <= 0), or not found.
+    */
+    public native float GetPoseParameter(int iParameter);
+
+    /**
+     * Sets the value of the given pose parameter index.
+     * 
+     * @param iParameter    The index of the pose parameter to set the value of.
+     * @param flValue       The value to set the pose parameter to.
+     * 
+     * @return              Unknown. Should be flValue itself.
+    */
+    public native float SetPoseParameter(int iParameter, float flValue);
+
+    /**
+     * Returns pose parameter range.
+     * 
+     * @note                Return the range if true, else minValue = 0.0, maxValue = 1.0.
+     * 
+     * @param index         The index of the pose parameter to get the range of.
+     * @param minValue      A float buffer to store the minimum value of the pose parameter.
+     * @param maxValue      A float buffer to store the maximum value of the pose parameter.
+     * 
+     * @return              True if the operation was successful, false otherwise.
+    */
+    public native bool GetPoseParameterRange(int index, float &minValue, float &maxValue);
+
+    /*<------------------->*/
+    /* HitBox Set Related */
+
+    /**
+     * Get/Set the value of m_nHitboxSet.
+    */
+    property int m_nHitboxSet {
+        public native get();
+        public native set(int setnum);
+    }
+
+    /**
+     * Retrieves the number of hitbox sets in the model.
+     * 
+     * @return          The number of hitbox sets in the model.
+     *                  -1 if the entity has no model.
+    */
+    public native int GetNumHitboxSets();
+
+    /**
+     * Computes a box's absolute position that surrounds all hitboxes.
+     * 
+     * @note                  Returns nothing on the vector if return false.
+     * @note                  See SDK: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/server/baseanimating.cpp#L3120
+     * 
+     * @param pVecWorldMins   A Vector buffer to store the minimums absolute position of the box.
+     * @param pVecWorldMaxs   A Vector buffer to store the maximums absolute position of the box.
+     * 
+     * @return                True if the operation was successful, false if the entity has no model or have a bad m_nHitboxSet value.
+    */
+    public native bool ComputeHitboxSurroundingBox(float pVecWorldMins[3], float pVecWorldMaxs[3]);
+
+    /**
+     * No descripting found yet.
+     * 
+     * @note                    See SDK: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/server/baseanimating.cpp#L3217
+     * 
+     * @return                  unknown.
+    */
+    public native int GetHitboxesFrontside(int boxList, int boxMax, const float normal[3], float dist);
+
+    /*<------------------------>*/
+    /* Animation Event Related */
+
+    /**
+     * Dispatches all animation events on one entity.
+     * 
+     * @note                Do nothing if the entity has no model, no available sequence, m_flPlaybackRate == 0.0, or it has no animation event.
+     * @note                Catches all animation events in the time frame of flFutureInterval, and calls HandleAnimEvent for each caught events. This is typically called every 0.1 seconds in the Think method.
+     * 
+     * @param eventHandler  The entity to dispatch the animation events on. For most cases, this should be yourself (this).
+     * 
+     * @noreturn
+    */
+    public native void DispatchAnimEvents(CBaseAnimating eventHandler);
+
+    /*<------------------------->*/
+    /* Animation / Misc Related */
+
+    /**
+     * Copy animation data of source entity's model to our own entity's model.
+     * This includes sequence index, model scale, cycle, effect...
+     * 
+     * @note            See: https://github.com/ValveSoftware/source-sdk-2013/tree/master/mp/src/game/server/baseanimating.cpp#L3207
+     * 
+     * @param pSource   The source entity to copy the animation data from. It uses instance since we need to pass a pointer.
+     * 
+     * @noreturn
+    */
+    public native void CopyAnimationDataFrom(CBaseAnimating pSource)
 }
 
 // Listed this native alone because it has no class.
@@ -725,6 +846,17 @@ native void ActivityList_NameForIndex(int activityIndex, char[] pszActivityName)
 */
 native int ActivityList_HighestActivity();
 
+/**
+ * Find the hitbox set index by name.
+ * 
+ * @param entity    The entity index to find the hitbox set for.
+ * @param name      The name of the hitbox set to find.
+ * 
+ * @return          The index of the hitbox set with the given name.
+ *                  -1 if the entity has no model, or the hitbox set is not found.
+*/
+native int FindHitboxSetByName(int entity, const char[] name);
+
 methodmap CStudioHdr
 {
     /*<------------------------>*/
@@ -761,6 +893,13 @@ methodmap CStudioHdr
      *                  Returns local attachment number if m_pVModel == NULL.
     */
     public native int GetNumAttachments();
+
+    /**
+     * Retrieves the number of pose parameters in the model.
+     * 
+     * @return          The number of pose parameters in the model.
+    */
+    public native int GetNumPoseParameters();
 }
 
 public SharedPlugin __pl_animating_library = 
@@ -838,15 +977,32 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.LookupAttachment");
     MarkNativeAsOptional("CBaseAnimating.GetAttachment");
 
+    MarkNativesAsOptional("CBaseAnimating.LookupPoseParameter");
+    MarkNativesAsOptional("CBaseAnimating.GetPoseParameter");
+    MarkNativesAsOptional("CBaseAnimating.SetPoseParameter");
+    MarkNativesAsOptional("CBaseAnimating.GetPoseParameterRange");
+
+    MarkNativeAsOptional("CBaseAnimating.m_nHitboxSet.get");
+    MarkNativeAsOptional("CBaseAnimating.m_nHitboxSet.set");
+    MarkNativeAsOptional("CBaseAnimating.ComputeHitboxSurroundingBox");
+    MarkNativeAsOptional("CBaseAnimating.GetNumHitboxSets");
+    MarkNativeAsOptional("CBaseAnimating.GetHitboxesFrontside");
+
+    MarkNativeAsOptional("CBaseAnimating.DispatchAnimEvents");
+
+    MarkNativeAsOptional("CBaseAnimating.CopyAnimationDataFrom");
+
     MarkNativeAsOptional("GetSequenceFlags");
     MarkNativeAsOptional("ActivityList_RegisterSharedActivity");
     MarkNativeAsOptional("ActivityList_RegisterPrivateActivity");
     MarkNativeAsOptional("ActivityList_IndexForName");
     MarkNativeAsOptional("ActivityList_NameForIndex");
     MarkNativeAsOptional("ActivityList_HighestActivity");
+    MarkNativeAsOptional("FindHitboxSetByName");
 
     MarkNativeAsOptional("CStudioHdr.CStudioHdr");
     MarkNativeAsOptional("CStudioHdr.deleteThis");
     MarkNativeAsOptional("CStudioHdr.GetNumAttachments");
+    MarkNativeAsOptional("CStudioHdr.GetNumPoseParameters");
 }
 #endif

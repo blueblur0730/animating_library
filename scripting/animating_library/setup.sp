@@ -86,7 +86,7 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper ret26 			= { SDKType_PlainOldData, SDKPass_Plain };
 	g_hSDKCall_SelectWeightedSequence	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::SelectWeightedSequence", params25, sizeof(params25), true, ret26);
 
-	SDKCallParamsWrapper params26[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }, {SDKType_PlainOldData, SDKPass_Plain}};
+	SDKCallParamsWrapper params26[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL }, {SDKType_PlainOldData, SDKPass_Plain}};
 	SDKCallParamsWrapper ret27 			= { SDKType_Float, SDKPass_Plain };
 	g_hSDKCall_LastVisibleCycle			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LastVisibleCycle", params26, sizeof(params26), true, ret27);
 
@@ -121,6 +121,37 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper params35[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_QAngle, SDKPass_ByRef }};
 	SDKCallParamsWrapper ret37 			= { SDKType_Bool, SDKPass_Plain };
 	g_hSDKCall_GetAttachment			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetAttachment", params35, sizeof(params35), true, ret37);
+
+	SDKCallParamsWrapper params36[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL } ,{ SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret38 			= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_LookupPoseParameter		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::LookupPoseParameter", params36, sizeof(params36), true, ret38);
+
+	SDKCallParamsWrapper params37[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }};
+	SDKCallParamsWrapper ret39 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_GetPoseParameter			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetPoseParameter", params37, sizeof(params37), true, ret39);
+
+	SDKCallParamsWrapper params38[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL }, { SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Float, SDKPass_Plain }};
+	SDKCallParamsWrapper ret40 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_SetPoseParameter			= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::SetPoseParameter", params38, sizeof(params38), true, ret40);
+
+	SDKCallParamsWrapper params39[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Float, SDKPass_ByRef }, { SDKType_Float, SDKPass_ByRef }};
+	SDKCallParamsWrapper ret41 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_GetPoseParameterRange	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetPoseParameterRange", params39, sizeof(params39), true, ret41);
+
+	// not sure if we should allow null on this one.
+	SDKCallParamsWrapper params40[] 	= {{ SDKType_Vector, SDKPass_Pointer }, { SDKType_Vector, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret42 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_ComputeHitboxSurroundingBox = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::ComputeHitboxSurroundingBox", params40, sizeof(params40), true, ret42);
+
+	SDKCallParamsWrapper params41[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer, VDECODE_FLAG_ALLOWNULL }, { SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_Float, SDKPass_Plain }};
+	SDKCallParamsWrapper ret43 			= { SDKType_Float, SDKPass_Plain };
+	g_hSDKCall_GetHitboxesFrontside		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::GetHitboxesFrontside", params41, sizeof(params41), true, ret43);
+
+	SDKCallParamsWrapper params42[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }};
+	g_hSDKCall_DispatchAnimEvents		= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Virtual, "CBaseAnimating::DispatchAnimEvent", params42, sizeof(params42), false, _);
+
+	SDKCallParamsWrapper params43[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }};
+	g_hSDKCall_CopyAnimationDataFrom	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::CopyAnimationDataFrom", params43, sizeof(params43), false, _);
 
 	g_iOS = gd.OS;
 
@@ -216,6 +247,10 @@ void CreateStaticSDKCalls(GameDataWrapper gd)
 	SDKCallParamsWrapper params4[] 					= {{ SDKType_PlainOldData, SDKPass_Plain }};
 	SDKCallParamsWrapper ret4 						= { SDKType_String, SDKPass_Pointer };
 	g_hSDKCall_ActivityList_NameForIndex			= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "ActivityList_NameForIndex", params4, sizeof(params4), true, ret4);
+
+	SDKCallParamsWrapper params5[] 					= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_String, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret5 						= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_FindHitboxSetByName					= gd.CreateSDKCallOrFail(SDKCall_Static, SDKConf_Signature, "FindHitboxSetByName", params5, sizeof(params5), true, ret5);
 }
 
 void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
@@ -229,12 +264,16 @@ void CreateCStuidoHdrSDKCalls(GameDataWrapper gd)
 
 	SDKCallParamsWrapper ret1				= { SDKType_PlainOldData, SDKPass_Plain };
 	g_hSDKCall_CStudioHdr_GetNumAttachments = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CStudioHdr::GetNumAttachments", _, _, true, ret1);
+
+	SDKCallParamsWrapper ret2				= { SDKType_PlainOldData, SDKPass_Plain };
+	g_hSDKCall_CStudioHdr_GetNumPoseParameters = gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CStudioHdr::GetNumPoseParameters", _, _, true, ret2);
 }
 
 void RetrieveOffsets(GameDataWrapper gd)
 {
-	g_iOffset_pStudioHdr = gd.GetOffset("CBaseAnimating->m_pStudioHdr");
-	g_iOffset_numbones	 = gd.GetOffset("studiohdr_t->numbones");
+	g_iOffset_pStudioHdr 	= gd.GetOffset("CBaseAnimating->m_pStudioHdr");
+	g_iOffset_numbones	 	= gd.GetOffset("studiohdr_t->numbones");
+	g_iOffset_numhitboxsets = gd.GetOffset("studiohdr_t->numhitboxsets");
 }
 
 void RetrieveAddress(GameDataWrapper gd)
@@ -305,14 +344,31 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.LookupAttachment", Native_LookupAttachment);
 	CreateNative("CBaseAnimating.GetAttachment", Native_GetAttachment);
 
+	CreateNative("CBaseAnimating.LookupPoseParameter", Native_LookupPoseParameter);
+	CreateNative("CBaseAnimating.SetPoseParameter", Native_SetPoseParameter);
+	CreateNative("CBaseAnimating.GetPoseParameter", Native_GetPoseParameter);
+	CreateNative("CBaseAnimating.GetPoseParameterRange", Native_GetPoseParameterRange);
+
+	CreateNative("CBaseAnimating.m_nHitboxSet.get", Native_GetHitboxSet);
+	CreateNative("CBaseAnimating.m_nHitboxSet.set", Native_SetHitboxSet);
+	CreateNative("CBaseAnimating.GetNumHitboxSets", Native_GetNumHitboxSets);
+	CreateNative("CBaseAnimating.ComputeHitboxSurroundingBox", Native_ComputeHitboxSurroundingBox);
+	CreateNative("CBaseAnimating.GetHitboxesFrontside", Native_GetHitboxesFrontside);
+
+	CreateNative("CBaseAnimating.DispatchAnimEvents", Native_DispatchAnimEvents);
+
+	CreateNative("CBaseAnimating.CopyAnimationDataFrom", Native_CopyAnimationDataFrom);
+
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 	CreateNative("ActivityList_RegisterSharedActivity", Native_ActivityList_RegisterSharedActivity);
 	CreateNative("ActivityList_RegisterPrivateActivity", Native_ActivityList_RegisterPrivateActivity);
 	CreateNative("ActivityList_IndexForName", Native_ActivityList_IndexForName);
 	CreateNative("ActivityList_NameForIndex", Native_ActivityList_NameForIndex);
 	CreateNative("ActivityList_HighestIndex", Native_ActivityList_HighestIndex);
+	CreateNative("FindHitboxSetByName", Native_FindHitboxSetByName);
 
 	CreateNative("CStudioHdr.CStudioHdr", Native_CStudioHdr);
 	CreateNative("CStudioHdr.deleteThis", Native_CStudioHdr_DeleteThis);
 	CreateNative("CStudioHdr.GetNumAttachments", Native_CStudioHdr_GetNumAttachments);
+	CreateNative("CStudioHdr.GetNumPoseParameters", Native_CStudioHdr_GetNumPoseParameters);
 }

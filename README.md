@@ -156,10 +156,38 @@
     5. ActivityList_HighestActivity
 
   - Changes:
-    1. Updated gamedata. Most windows call, which need a relative call address, that pointed to GetScriptDesc<\CBaseAnimating> in previous version, has been redirect to a new proper function that can make a relative call address.
+    1. Updated gamedata. Most windows calls, which need a relative call address, that pointed to GetScriptDesc<\CBaseAnimating> in previous version, has been redirected to a new proper function that can make a relative call address.
     2. CBaseAnimating.GetBodyGroupName has difference on linux and windows now. While linux platform calls the original CBaseAnimating::GetBodyGroupName(), windows platform calls GetBodyGroupName() directly.
     3. Fixed string param pass in SDKCall.
 
 - 10/13/24: v1.7.2
   - Changes:
     1. Relocation of files.
+
+- 10/13/24: v1.8
+  - Natives:
+    1. CBaseAnimating.LookupPoseParameter
+    2. CBaseAnimating.GetPoseParameter
+    3. CBaseAnimating.SetPoseParameter
+    4. CBaseAnimating.GetPoseParameterRange
+    5. CBaseAnimating.m_nHitboxSet.get
+    6. CBaseAnimating.m_nHitboxSet.set
+    7. CBaseAnimating.ComputeHitboxSurroundingBox
+    8. CBaseAnimating.GetNumHitboxSets
+    9. CBaseAnimating.GetHitboxesFrontside
+    10. CBaseAnimating.DispatchAnimEvents
+    11. CBaseAnimating.CopyAnimationDataFrom
+    12. FindHitboxSetByName
+    13. CStudioHdr.GetNumPoseParameters
+  
+  - Changes:
+    1. A lot check added on the previous natives.
+    2. CBaseAnimating.GetNumBones should return -1 if the entity has no model.
+    3. Parameter can be null on passing to of CBaseAnimating.LastVisibleCycle.
+    4. Modified some documentations.
+
+  - TODO:
+    1. This should be enough so far. Later there are some other replaceable functions in CBaseAnimating can be added.
+    2. Build the test and fix the bugs (hopefully?)
+    3. CBaseAnimatingOverlay? CBaseCombatCharacter?
+    4. May use operator new soley for memory allocation to create a CStudioHdr instance?

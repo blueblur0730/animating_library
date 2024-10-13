@@ -7,18 +7,20 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.7.2"
+#define PLUGIN_VERSION "1.8"
 
 Handle
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
 	g_hSDKCall_ModelSoundCache_FinishModel = null,
 	g_hSDKCall_CStudioHdr_GetNumAttachments = null,
+	g_hSDKCall_CStudioHdr_GetNumPoseParameters = null,
 
 	g_hSDKCall_GetSequenceFlags						= null,
 	g_hSDKCall_ActivityList_RegisterSharedActivity	= null,
 	g_hSDKCall_ActivityList_RegisterPrivateActivity = null,
 	g_hSDKCall_ActivityList_IndexForName			= null,
 	g_hSDKCall_ActivityList_NameForIndex			= null,
+	g_hSDKCall_FindHitboxSetByName					= null,
 
 	g_hSDKCall_GetBaseAnimating		  	= null,
 	g_hSDKCall_FindBodyGroupByName	  	= null,
@@ -63,12 +65,24 @@ Handle
 	g_hSDKCall_GetHitboxBone			= null,
 
 	g_hSDKCall_LookupAttachment			= null,
-	g_hSDKCall_GetAttachment			= null;
+	g_hSDKCall_GetAttachment			= null,
+
+	g_hSDKCall_LookupPoseParameter		= null,
+	g_hSDKCall_SetPoseParameter			= null,
+	g_hSDKCall_GetPoseParameter			= null,
+	g_hSDKCall_GetPoseParameterRange	= null,
+
+	g_hSDKCall_ComputeHitboxSurroundingBox = null,
+	g_hSDKCall_GetHitboxesFrontside		= null,
+
+	g_hSDKCall_DispatchAnimEvents		= null,
+	g_hSDKCall_CopyAnimationDataFrom	= null;	
 
 
 int 
-	g_iOffset_pStudioHdr = -1,
-	g_iOffset_numbones	 = -1;
+	g_iOffset_pStudioHdr 	= -1,
+	g_iOffset_numbones	 	= -1,
+	g_iOffset_numhitboxsets = -1;
 
 OperatingSystem g_iOS;
 
@@ -132,7 +146,7 @@ bool HasModel(int entity)
 // this function loads an existed CStudioHdr instance of an entity's model.
 Address GetModelPtr(Address pBaseAnimating)
 {
-	return LoadFromAddress(pBaseAnimating + view_as<Address>(g_iOffset_pStudioHdr), NumberType_Int32);
+	return view_as<Address>(LoadFromAddress(pBaseAnimating + view_as<Address>(g_iOffset_pStudioHdr), NumberType_Int32));
 }
 
 // Big thanks to LuqS

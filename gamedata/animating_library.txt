@@ -1,16 +1,21 @@
 "Games"
 {
-	"#default"
-	{
-		"Offsets"
-		{
-			"OS"
-			{
-				"linux"			"1"
-				"windows"		"0"
-			}
-		}
-	}
+    "#default"
+    {
+        "#supported"
+        {
+            "game"  "left4dead2"
+        }
+
+        "Offsets"
+        {
+            "OS"
+            {
+                "linux"			"1"
+                "windows"		"0"
+            }
+        }
+    }
 
     //-----------------------------------------------------------------------
     // feel free to use any of these signatures and offsets if you need one. 
@@ -162,6 +167,12 @@
                 "windows"	"156"
             }
 
+            "studiohdr_t->numhitboxsets"
+            {
+                "linux"     "172"
+                "windows"   "172"
+            }
+
             //--------------------------
             // Virtual function offsets
             //--------------------------
@@ -194,6 +205,12 @@
             {
                 "linux"     "28"
                 "windows"   "27"
+            }
+
+            "CBaseAnimating::DispatchAnimEvents"
+            {
+                "linux"     "217"
+                "windows"   "216"
             }
         }
 
@@ -630,7 +647,7 @@
 
             // windows sig:
             // search for string "smoker_mouth" find the only call which is CTongue::GetSegmentStart
-            // the call under the call that passes "smoker_mouth" is CBaseAnimating::GetAttachment
+            // the call under the string "smoker_mouth" is CBaseAnimating::GetAttachment
             "CBaseAnimating::GetAttachment"
             {
                 "library"   "server"
@@ -639,15 +656,97 @@
                 /* 55 8B EC 83 EC 34 A1 ? ? ? ? 33 C5 89 45 FC 8B 01 8B 80 6C 03 00 00 53 */
             }
 
-            //--------------------------------
+            // windows sig:
+            // search for string "body_pitch" to find all occurances, the 4th should be ZombieBotBody::OnModelChanged
+            // now you see every string is a parameter of CBaseAnimating::LookupPoseParameter, choose a one and click in.
+            "CBaseAnimating::LookupPoseParameter"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating19LookupPoseParameterEP10CStudioHdrPKc"
+                "windows"   "\x55\x8B\xEC\x57\x8B\x7D\x08\x85\xFF\x75\x2A\x33\xC0\x5F\x5D\xC2\x08\x00"
+                /* 55 8B EC 57 8B 7D 08 85 FF 75 ? 33 C0 5F 5D C2 08 00 */
+            }
+
+            // windows sig:
+            // search for string "%s: %f" to find Infected::DrawInfectedDebug,
+            // the call above the sting is CBaseAnimating::GetPoseParameter.
+            "CBaseAnimating::GetPoseParameter"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating16GetPoseParameterEi"
+                "windows"   "\x55\x8B\xEC\x56\x57\x8B\xF9\x83\xBF\xD0\x13\x00\x00\x00"
+                /* 55 8B EC 56 57 8B F9 83 BF D0 13 00 00 00 */
+            }
+
+            // windows sig:
+            // search for string "ZombieBotBody::AimHeadTowards( pos )" to find ZombieBotBody::AimHeadTowards
+            // the last call in this function is CBaseAnimating::SetPoseParameter.
+            "CBaseAnimating::SetPoseParameter"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating16SetPoseParameterEP10CStudioHdrif"
+                "windows"   "\x55\x8B\xEC\x8B\x45\x08\x57\x8B\xF9\x85\xC0\x74\x2A"
+                /* 55 8B EC 8B 45 08 57 8B F9 85 C0 74 ? */
+            }
+
+            // windows sig:
+            // search for string "FireContext" to find CPropMountedGun::FireThink (should be easy to find since there's only 4 matched results)
+            // right under 2 calls below the string, which only pass a 'this', the call is CPropMountedGun::UpdatePoseParameters, click in.
+            // the last call of this function is CPropMountedGun::UpdatePoseParameter, click in.
+            // inside of it, the first call is CBaseAnimating::GetPoseParameterRang.
+            "CBaseAnimating::GetPoseParameterRange"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating21GetPoseParameterRangeEiRfS0_"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x57\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\xB6\xD0\x13\x00\x00\x85\xF6\x74\x2A\x83\x3E\x00\x74\x2A\x8B\x7D\x08\x85\xFF"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 57 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B B6 D0 13 00 00 85 F6 74 ? 83 3E 00 74 ? 8B 7D 08 85 FF */
+            }
+
+            // windows sig:
+            // search for CCollisionProperty's vtable, the target is CCollisionProperty::WorldSpaceSurroundingBounds (offset 15) (three args, one pointer two vectors)
+            // it has only call inside: CCollisionProperty::ComputeSurroundingBox, click in.
+            // inside of it, the third call is CCollisionProperty::ComputeHitboxSurroundingBox, click in.
+            // inside of it, there's only one call: CBaseAnimating::ComputeHitboxSurroundingBox.
+            "CBaseAnimating::ComputeHitboxSurroundingBox"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating27ComputeHitboxSurroundingBoxEP6VectorS1_"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x3C\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00"
+                /* 55 8B EC 83 EC 3C 56 8B F1 83 BE D0 13 00 00 00 */
+            }
+
+            // windows sig:
+            // find CreateServerRagdoll like above.
+            // notice this "v69 = -1082130432;", the call down of it is CBaseAnimating::GetHitboxesFrontside (it passes a parameter 128.)
+            "CBaseAnimating::GetHitboxesFrontside"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating20GetHitboxesFrontsideEPiiRK6Vectorf"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x5C\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x8B\x45\x08\x53"
+                /* 55 8B EC 83 EC 5C A1 ? ? ? ? 33 C5 89 45 FC 8B 45 08 53 */
+            }
+            
+            // windows sig:
+            // search for string "prop_ragdoll" to find CreateServerRagdoll
+            // the call next down to the string is CBaseAnimating::CopyAnimationDataFrom.
+            "CBaseAnimating::CopyAnimationDataFrom"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating21CopyAnimationDataFromEPS_"
+                "windows"   "\x55\x8B\xEC\x53\x56\x57\x8B\x7D\x08\x8B\x07\x8B\x50\x1C"
+                /* 55 8B EC 53 56 57 8B 7D 08 8B 07 8B 50 1C  */
+            }
+
+            //-----------------------
             // CStudioHdr functions
-            //--------------------------------
+            //-----------------------
 
             // windows sig:
             // find CModelSoundsCache::Rebuild on its own vtable (offset 2)
             // the first call is it.
             "ModelSoundsCache_LoadModel"
             {
+                // note: may change this to call operator new(0x68), then call CStudioHdr::CStudioHdr.
                 "library"   "server"
                 "linux"     "@_Z26ModelSoundsCache_LoadModelPKc"
                 "windows"   "\x55\x8B\xEC\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x01\x8B\x55\x08\x8B\x40\x14"
@@ -658,6 +757,7 @@
             // same as above, the third call is it.
             "ModelSoundsCache_FinishModel"
             {
+                // note: may change this to call operator delete(a1).
                 "library"   "server"
                 "linux"     "@_Z28ModelSoundsCache_FinishModelP10CStudioHdr"
                 "windows"   "\x55\x8B\xEC\x56\x8B\x75\x08\x85\xF6\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8D\x4E\x40"
@@ -677,6 +777,17 @@
                 /* 8B 41 04 85 C0 75 ? 8B 01 8B 80 F0 00 00 00 */
             }
 
+            // windows sig:
+            // find CBaseAnimating::LookupPoseParameter, notice statement "if ( ++v3 >= sub_101E3D60(a1) )"
+            // the call is CStudioHdr::GetNumPoseParameters
+            "CStudioHdr::GetNumPoseParameters"
+            {
+                "library"   "server"
+                "linux"     "@_ZNK10CStudioHdr20GetNumPoseParametersEv"
+                "windows"   "\x8B\x41\x04\x85\xC0\x75\x2A\x8B\x09"
+                /* 8B 41 04 85 C0 75 ? 8B 09  */
+            }
+
             //-------------------
             // Static functions
             //-------------------
@@ -690,7 +801,7 @@
                 "library"   "server"
                 "linux"     "@_Z16GetSequenceFlagsP10CStudioHdri"
                 "windows"   "\x55\x8B\xEC\x56\x57\x8B\x7D\x08\x85\xFF\x74\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x84\xC0\x74\x2A\x8B\x75\x0C\x85\xF6\x78\x2A\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x3B\xF0\x7D\x2A\x56\x8B\xCF\xE8\x2A\x2A\x2A\x2A\x8B\x40\x0C"
-                /*  55 8B EC 56 57 8B 7D 08 85 FF 74 ? 8B CF E8 ? ? ? ? 84 C0 74 ? 8B 75 0C 85 F6 78 ? 8B CF E8 ? ? ? ? 3B F0 7D ? 56 8B CF E8 ? ? ? ? 8B 40 0C*/
+                /*  55 8B EC 56 57 8B 7D 08 85 FF 74 ? 8B CF E8 ? ? ? ? 84 C0 74 ? 8B 75 0C 85 F6 78 ? 8B CF E8 ? ? ? ? 3B F0 7D ? 56 8B CF E8 ? ? ? ? 8B 40 0C */
             }
 
             // windows sig:
@@ -735,6 +846,17 @@
                 "linux"     "@_Z25ActivityList_NameForIndexi"
                 "windows"   "\x55\x8B\xEC\x8B\x15\x2A\x2A\x2A\x2A\x33\xC0"
                 /* 55 8B EC 8B 15 ? ? ? ? 33 C0 */
+            }
+
+            // windows sig:
+            // search for string "entryboxes" to find CBaseServerVehicle::GetEntryAnimForPoint
+            // the call that passes "entryboxes" is FindHitboxSetByName.
+            "FindHitboxSetByName"
+            {
+                "library"   "server"
+                "linux"     "@_Z19FindHitboxSetByNameP10CStudioHdrPKc"
+                "windows"   "\x55\x8B\xEC\x53\x8B\x5D\x08\x85\xDB\x75\x2A\x83\xC8\xFF\x5B\x5D\xC3\x8B\x03"
+                /* 55 8B EC 53 8B 5D 08 85 DB 75 ? 83 C8 FF 5B 5D C3 8B 03 */
             }
         }
     }
