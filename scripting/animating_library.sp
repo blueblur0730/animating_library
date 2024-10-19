@@ -7,7 +7,7 @@
 #include <entity_prop_stocks>
 
 #define GAMEDATA_FILE  "animating_library"
-#define PLUGIN_VERSION "1.8"
+#define PLUGIN_VERSION "1.8.1"
 
 Handle
 	g_hSDKCall_ModelSoundCache_LoadModel   = null,
@@ -76,7 +76,10 @@ Handle
 	g_hSDKCall_GetHitboxesFrontside		= null,
 
 	g_hSDKCall_DispatchAnimEvents		= null,
-	g_hSDKCall_CopyAnimationDataFrom	= null;	
+	g_hSDKCall_HasAnimEvent				= null,
+
+	g_hSDKCall_CopyAnimationDataFrom	= null,
+	g_hSDKCall_ExtractBbox				= null;
 
 
 int 

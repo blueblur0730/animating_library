@@ -153,6 +153,14 @@ void CreateSDKCalls(GameDataWrapper	gd)
 	SDKCallParamsWrapper params43[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }};
 	g_hSDKCall_CopyAnimationDataFrom	= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::CopyAnimationDataFrom", params43, sizeof(params43), false, _);
 
+	SDKCallParamsWrapper params44[] 	= {{ SDKType_PlainOldData, SDKPass_Plain }, { SDKType_Vector, SDKPass_ByRef }, { SDKType_Vector, SDKPass_ByRef }};
+	SDKCallParamsWrapper ret44 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_ExtractBbox				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::ExtractBbox", params44, sizeof(params44), true, ret44);
+
+	SDKCallParamsWrapper params45[] 	= {{ SDKType_PlainOldData, SDKPass_Pointer }, { SDKType_PlainOldData, SDKPass_Pointer }};
+	SDKCallParamsWrapper ret45 			= { SDKType_Bool, SDKPass_Plain };
+	g_hSDKCall_HasAnimEvent				= gd.CreateSDKCallOrFail(SDKCall_Raw, SDKConf_Signature, "CBaseAnimating::HasAnimEvent", params45, sizeof(params45), true, ret45);
+
 	g_iOS = gd.OS;
 
 	switch (gd.OS)
@@ -356,8 +364,10 @@ void CreateNatives()
 	CreateNative("CBaseAnimating.GetHitboxesFrontside", Native_GetHitboxesFrontside);
 
 	CreateNative("CBaseAnimating.DispatchAnimEvents", Native_DispatchAnimEvents);
+	CreateNative("CBaseAnimating.HasAnimEvent", Native_HasAnimEvent);
 
 	CreateNative("CBaseAnimating.CopyAnimationDataFrom", Native_CopyAnimationDataFrom);
+	CreateNative("CBaseAnimating.ExtractBbox", Native_ExtractBbox);
 
 	CreateNative("GetSequenceFlags", Native_GetSequenceFlags);
 	CreateNative("ActivityList_RegisterSharedActivity", Native_ActivityList_RegisterSharedActivity);

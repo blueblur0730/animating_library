@@ -191,3 +191,8 @@
     2. Build the test and fix the bugs (hopefully?)
     3. CBaseAnimatingOverlay? CBaseCombatCharacter?
     4. May use operator new soley for memory allocation to create a CStudioHdr instance?
+
+- 10/20/24: v1.8.1
+  - Natives:
+    1. CBaseAnimating.HasAnimEvent
+    2. CBaseAnimating.ExtractBbox

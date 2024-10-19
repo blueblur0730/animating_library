@@ -60,7 +60,7 @@ methodmap CBaseAnimating
     /* CBaseAnimating Constructor */
 
     /**
-     * Creates a new CBaseAnimating instance. Use this before use any of the native functions below.
+     * Retrieves (not create.) a new CBaseAnimating instance. Use this before use any of the native functions below.
      * 
      * @param entity    The entity index of the instance. (must have a model)
      * 
@@ -757,6 +757,16 @@ methodmap CBaseAnimating
     */
     public native void DispatchAnimEvents(CBaseAnimating eventHandler);
 
+    /**
+     * Checks if a sequence index has an animation event.
+     * 
+     * @param nSequence  The index of the sequence to check.
+     * @param nEvent     Animation event index to look for.
+     * 
+     * @return          Returns true if the given sequence has the anim event, false if not.
+    */
+    public native bool HasAnimEvent(int nSequence, int nEvent);
+
     /*<------------------------->*/
     /* Animation / Misc Related */
 
@@ -770,7 +780,18 @@ methodmap CBaseAnimating
      * 
      * @noreturn
     */
-    public native void CopyAnimationDataFrom(CBaseAnimating pSource)
+    public native void CopyAnimationDataFrom(CBaseAnimating pSource);
+
+    /**
+     * Retrieves the bounding box of the given sequence.
+     * 
+     * @param sequence  The index of the sequence to get the bounding box of.
+     * @param mins      A Vector buffer to store the minimums of the bounding box.
+     * @param maxs      A Vector buffer to store the maximums of the bounding box.
+     * 
+     * @return          True if the operation was successful, false if the entity has no model or the sequence is not available.
+    */
+    public native bool ExtractBbox(int sequence, float mins[3], float maxs[3]);
 }
 
 // Listed this native alone because it has no class.
@@ -989,8 +1010,10 @@ public void __pl_animating_library_SetNTVOptional()
     MarkNativeAsOptional("CBaseAnimating.GetHitboxesFrontside");
 
     MarkNativeAsOptional("CBaseAnimating.DispatchAnimEvents");
+    MarkNativeAsOptional("CBaseAnimating.HasAnimEvent");
 
     MarkNativeAsOptional("CBaseAnimating.CopyAnimationDataFrom");
+    MarkNativeAsOptional("CBaseAnimating.ExtractBbox");
 
     MarkNativeAsOptional("GetSequenceFlags");
     MarkNativeAsOptional("ActivityList_RegisterSharedActivity");

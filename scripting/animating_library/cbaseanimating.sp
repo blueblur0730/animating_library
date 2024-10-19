@@ -884,6 +884,17 @@ any Native_DispatchAnimEvents(Handle plugin, int numParams)
 	return 0;
 }
 
+any Native_HasAnimEvent(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_INVALID_ADDRESS, "Invalid CBaseAnimating object.");
+
+	int iSequence = GetNativeCell(2);
+	int iEvent = GetNativeCell(3);
+
+	return view_as<bool>(SDKCall(g_hSDKCall_HasAnimEvent, GetNativeCell(1), iSequence, iEvent));
+}
+
 any Native_CopyAnimationDataFrom(Handle plugin, int numParams)
 {
 	if (!ValidateAddress(GetNativeCell(1)))
@@ -897,4 +908,21 @@ any Native_CopyAnimationDataFrom(Handle plugin, int numParams)
 	SDKCall(g_hSDKCall_CopyAnimationDataFrom, GetNativeCell(1), pBaseAnimating);
 
 	return 0;
+}
+
+any Native_ExtractBbox(Handle plugin, int numParams)
+{
+	if (!ValidateAddress(GetNativeCell(1)))
+		ThrowNativeError(SP_ERROR_INVALID_ADDRESS, "Invalid CBaseAnimating object.");
+
+	int iSequence;
+	float vecMins[3], vecMaxs[3];
+	GetNativeArray(3, vecMins, sizeof(vecMins));
+	GetNativeArray(4, vecMaxs, sizeof(vecMaxs));
+
+	bool bSuccess = view_as<bool>(SDKCall(g_hSDKCall_ExtractBbox, GetNativeCell(1), iSequence, vecMins, vecMaxs));
+	SetNativeArray(3, vecMins, sizeof(vecMins));
+	SetNativeArray(4, vecMaxs, sizeof(vecMaxs));
+
+	return bSuccess;
 }

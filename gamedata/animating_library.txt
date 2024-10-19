@@ -725,6 +725,18 @@
                 "windows"   "\x55\x8B\xEC\x83\xEC\x5C\xA1\x2A\x2A\x2A\x2A\x33\xC5\x89\x45\xFC\x8B\x45\x08\x53"
                 /* 55 8B EC 83 EC 5C A1 ? ? ? ? 33 C5 89 45 FC 8B 45 08 53 */
             }
+
+            // windows sig:
+            // search for string "#L4D_Hint_pz_no_break_rescue_doors" to find CBasePropDoor::TryOpenClose
+            // down the buttom of the function, notice this 'if' statement "if ( v24 == -1 || !(unsigned __int8)sub_10031D90(v24, 1) )"
+            // the call is CBaseAnimating::HasAnimEvent.
+            "CBaseAnimating::HasAnimEvent"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating12HasAnimEventEii"
+                "windows"   "\x55\x8B\xEC\x83\xEC\x18\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\xB6\xD0\x13\x00\x00"
+                /* 55 8B EC 83 EC 18 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B B6 D0 13 00 00 */
+            }
             
             // windows sig:
             // search for string "prop_ragdoll" to find CreateServerRagdoll
@@ -735,6 +747,18 @@
                 "linux"     "@_ZN14CBaseAnimating21CopyAnimationDataFromEPS_"
                 "windows"   "\x55\x8B\xEC\x53\x56\x57\x8B\x7D\x08\x8B\x07\x8B\x50\x1C"
                 /* 55 8B EC 53 56 57 8B 7D 08 8B 07 8B 50 1C  */
+            }
+
+            // windows sig:
+            // find CCollisionProperty::ComputeSurroundingBox like above told.
+            // down the buttom of the function, the last call in the 'switch' statement is CCollisionProperty::ComputeRotationExpandedSequenceBounds, click in.
+            // inside of it, the last call is CBaseAnimating::ExtractBbox.
+            "CBaseAnimating::ExtractBbox"
+            {
+                "library"   "server"
+                "linux"     "@_ZN14CBaseAnimating11ExtractBboxEiR6VectorS1_"
+                "windows"   "\x55\x8B\xEC\x56\x8B\xF1\x83\xBE\xD0\x13\x00\x00\x00\x75\x2A\xE8\x2A\x2A\x2A\x2A\x85\xC0\x74\x2A\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x86\xD0\x13\x00\x00\x5E\x85\xC0\x74\x2A\x83\x38\x00\x75\x2A\x33\xC0\x8B\x4D\x10"
+                /* 55 8B EC 56 8B F1 83 BE D0 13 00 00 00 75 ? E8 ? ? ? ? 85 C0 74 ? 8B CE E8 ? ? ? ? 8B 86 D0 13 00 00 5E 85 C0 74 ? 83 38 00 75 ? 33 C0 8B 4D 10 */
             }
 
             //-----------------------
